@@ -1,11 +1,12 @@
 import { join } from "path";
 import API, { ProviderType } from "../../API";
 import { Database } from "sqlite3";
-import { Provider, ProviderEpisodes, Result } from "../../AniSync";
+import { ProviderEpisodes, Result } from "../../AniSync";
 import { createWriteStream } from "fs";
 import * as CryptoJS from "crypto-js";
 import { load } from "cheerio";
 import { config } from "../../config";
+import * as colors from "colors";
 
 export default class Anime extends API {
     public baseUrl:string = undefined;
@@ -50,7 +51,9 @@ export default class Anime extends API {
                     const stmt = db.prepare("INSERT INTO anime(id, anilist, connectors) VALUES ($id, $anilist, $connectors)");
                     stmt.run({ $id: result.id, $anilist: JSON.stringify(result.anilist), $connectors: JSON.stringify(result.connectors) });
                     stmt.finalize();
-                    console.log("Inserted " + result.anilist.title.english);
+                    if (config.crawling.debug) {
+                        console.log(colors.white("Inserted ") + colors.cyan(result.anilist.title.romaji) + colors.gray(" into database."));
+                    }
                 }
             }
             return true;
@@ -454,6 +457,13 @@ export default class Anime extends API {
 
     public async extractStreamTape(url:URL): Promise<SubbedSource> {
         throw new Error("Method not implemented yet.");
+    }
+
+    public async clear(): Promise<void> {
+        const db = this.db;
+        const stmt = db.prepare("DELETE FROM anime");
+        stmt.run();
+        stmt.finalize();
     }
 }
 

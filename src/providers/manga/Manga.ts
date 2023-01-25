@@ -4,6 +4,7 @@ import { Database } from "sqlite3";
 import { ProviderChapters, Result } from "../../AniSync";
 import { createWriteStream } from "fs";
 import { config } from "../../config";
+import * as colors from "colors";
 
 export default class Manga extends API {
     public baseUrl:string = undefined;
@@ -48,7 +49,10 @@ export default class Manga extends API {
                     const stmt = db.prepare("INSERT INTO manga(id, anilist, connectors) VALUES ($id, $anilist, $connectors)");
                     stmt.run({ $id: result.id, $anilist: JSON.stringify(result.anilist), $connectors: JSON.stringify(result.connectors) });
                     stmt.finalize();
-                    console.log("Inserted " + result.anilist.title.english);
+
+                    if (config.crawling.debug) {
+                        console.log(colors.white("Inserted ") + colors.cyan(result.anilist.title.romaji) + colors.white(" into database."));
+                    }
                 }
             }
             return true;
@@ -186,6 +190,13 @@ export default class Manga extends API {
                 }
             });
         });
+    }
+
+    public async clear(): Promise<void> {
+        const db = this.db;
+        const stmt = db.prepare("DELETE FROM manga");
+        stmt.run();
+        stmt.finalize();
     }
 }
 

@@ -15,6 +15,7 @@ import Zoro from "./providers/anime/Zoro";
 import CrunchyRoll from "./providers/anime/CrunchyRoll";
 import { Chapter, Page } from "./providers/manga/Manga";
 import Kitsu from "./providers/meta/Kitsu";
+import * as colors from "colors";
 
 export default class AniSync extends API {
     private stringSim:StringSimilarity = new StringSimilarity();
@@ -268,7 +269,7 @@ export default class AniSync extends API {
             for (let i = start; i < maxPages && canCrawl; i++) {
                 const debugTimer = new Date(Date.now());
                 if (config.crawling.debug) {
-                    console.log(("Crawling page ") + i + ("..."));
+                    console.log(colors.gray("Crawling page ") + i + colors.gray("..."));
                 }
 
                 const aniListMedia = [];
@@ -281,11 +282,11 @@ export default class AniSync extends API {
                             return null;
                         });
                         if (!aniListData) {
-                            console.log(("Can't get " + id + "."));
+                            console.log(colors.red("Can't get " + id + "."));
                         } else {
                             const data = aniListData.data.Media;
                             if (!data) {
-                                console.log(("No more data to crawl."));
+                                console.log(colors.red("No more data to crawl."));
                                 canCrawl = false;
                             }
                             aniListMedia.push(data);
@@ -295,35 +296,35 @@ export default class AniSync extends API {
                 }
 
                 if (!aniListMedia || aniListMedia.length === 0) {
-                    console.log(("No more data to crawl."));
+                    console.log(colors.red("No more data to crawl."));
                     canCrawl = false;
                 }
                 
                 if (config.crawling.debug) {
-                    console.log(("Fetched seasonal data..."));
+                    console.log(colors.gray("Fetched seasonal data..."));
                 }
 
                 const data:Result[] = await this.fetchCrawlData(aniListMedia, type);
 
                 if (config.crawling.debug) {
                     const endTimer = new Date(Date.now());
-                    console.log(("Finished fetching data. Request took ") + (String(endTimer.getTime() - debugTimer.getTime())) + (" milliseconds."));
+                    console.log(colors.white("Finished fetching data. Request took ") + colors.cyan(String(endTimer.getTime() - debugTimer.getTime())) + colors.white(" milliseconds."));
                 }
 
                 await anime.insert(data);
 
                 if (config.crawling.debug) {
-                    console.log(("Finished inserting shows."));
+                    console.log(colors.gray("Finished inserting shows."));
                 }
 
                 await this.wait(wait);
             }
-            console.log(("Finished crawling!"));
+            console.log(colors.cyan("Finished crawling!"));
         } else {
             const manga = new ComicK();
             let canCrawl = true;
 
-            const ids = await this.getAnimeIDs();
+            const ids = await this.getMangaIDs();
             const pages = Math.ceil(ids.length / idsPerPage);
             if (pages < maxPages) {
                 maxPages = pages;
@@ -332,7 +333,7 @@ export default class AniSync extends API {
             for (let i = start; i < maxPages && canCrawl; i++) {
                 const debugTimer = new Date(Date.now());
                 if (config.crawling.debug) {
-                    console.log(("Crawling page ") + i + ("..."));
+                    console.log(colors.gray("Crawling page ") + i + colors.gray("..."));
                 }
 
                 const aniListMedia = [];
@@ -345,11 +346,11 @@ export default class AniSync extends API {
                             return null;
                         });
                         if (!aniListData) {
-                            console.log("Can't get " + id + ".");
+                            console.log(colors.red("Can't get " + id + "."));
                         } else {
                             const data = aniListData.data.Media;
                             if (!data) {
-                                console.log("No more data to crawl.");
+                                console.log(colors.red("No more data to crawl."));
                                 canCrawl = false;
                             }
                             aniListMedia.push(data);
@@ -359,30 +360,30 @@ export default class AniSync extends API {
                 }
 
                 if (!aniListMedia || aniListMedia.length === 0) {
-                    console.log("No more data to crawl.");
+                    console.log(colors.red("No more data to crawl."));
                     canCrawl = false;
                 }
-                
+            
                 if (config.crawling.debug) {
-                    console.log("Fetched seasonal data...");
+                    console.log(colors.gray("Fetched seasonal data..."));
                 }
 
                 const data:Result[] = await this.fetchCrawlData(aniListMedia, type);
 
                 if (config.crawling.debug) {
                     const endTimer = new Date(Date.now());
-                    console.log("Finished fetching data. Request took ") + (String(endTimer.getTime() - debugTimer.getTime())) + (" milliseconds.");
+                    console.log(colors.white("Finished fetching data. Request took ") + colors.cyan(String(endTimer.getTime() - debugTimer.getTime())) + colors.white(" milliseconds."));
                 }
 
                 await manga.insert(data);
 
                 if (config.crawling.debug) {
-                    console.log("Finished inserting manga.");
+                    console.log(colors.gray("Finished inserting manga."));
                 }
 
                 await this.wait(wait);
             }
-            console.log("Finished crawling!");
+            console.log(colors.cyan("Finished crawling!"));
         }
     }
 
