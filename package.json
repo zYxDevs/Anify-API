@@ -1,0 +1,53 @@
+{
+    "devDependencies": {
+        "@types/node": "^18.11.13",
+        "typescript": "^4.9.4"
+    },
+    "name": "anify-api",
+    "description": "API for https://anify.club/",
+    "version": "1.0.3",
+    "main": "./built/AniSync.js",
+    "scripts": {
+        "test": "node ./scripts/test.js",
+        "build": "tsc --build",
+        "clean": "tsc --build --clean",
+        "create_db": "node ./scripts/create_db.js",
+        "config": "tsc ./src/config.ts",
+        "insert_novels": "node ./scripts/insert_novels.js",
+        "create_covers": "node ./scripts/create_covers.js",
+        "clear:anime": "node ./scripts/clear_anime.js",
+        "clear:manga": "node ./scripts/clear_manga.js",
+        "crawl:anime": "node ./scripts/crawl_anime.js",
+        "crawl:manga": "node ./scripts/crawl_manga.js",
+        "export:anime": "node ./scripts/export_anime.js",
+        "export:manga": "node./scripts/export_manga.js",
+        "start": "node ./built/server/server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Eltik/Anify-API.git"
+    },
+    "author": "eltik",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Eltik/Anify-API/issues"
+    },
+    "homepage": "https://github.com/Eltik/Anify-API#readme",
+    "dependencies": {
+        "@fastify/cors": "^8.2.0",
+        "@fastify/formbody": "^7.4.0",
+        "@fastify/rate-limit": "^7.6.0",
+        "@fastify/static": "^6.6.0",
+        "@fastify/swagger": "^8.3.0",
+        "axios": "^0.27.2",
+        "cheerio": "^1.0.0-rc.12",
+        "colors": "^1.4.0",
+        "cronchy": "^0.0.9",
+        "crypto-js": "^4.1.1",
+        "fastify": "^4.10.2",
+        "node-fetch": "^2.6.7",
+        "node-poppler": "^6.1.0",
+        "probe-image-size": "^7.2.3",
+        "sqlite3": "^5.1.4"
+    }
+}
