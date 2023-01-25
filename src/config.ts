@@ -2,7 +2,7 @@ export var config = {
     storage: "/Users/eltik/Documents/Coding/Anify-API/storage",
     web_server: {
         use_http: false,
-        password: "Corelia63^#",
+        password: "Corelia63^#", // Encryption/decryption password. Not important (this password is leaked by the way, so don't try to use it for anything lol)
         port: 3060,
         url: "https://api.anify.tv",
         cors: ["https://anifytv.vercel.app", "https://anify.club", "https://api.anify.club", "https://anify.tv", "https://api.anify.tv", "http://localhost:3000", "http://localhost:3060"]
