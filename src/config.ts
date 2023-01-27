@@ -4,7 +4,8 @@ export var config = {
         use_http: false,
         password: "Corelia63^#", // Encryption/decryption password. Not important (this password is leaked by the way, so don't try to use it for anything lol)
         port: 3060,
-        url: "https://api.anify.tv",
+        //url: "https://api.anify.tv",
+        url: "http://localhost:3060",
         cors: ["https://anifytv.vercel.app", "https://anify.club", "https://api.anify.club", "https://anify.tv", "https://api.anify.tv", "http://localhost:3000", "http://localhost:3060"]
     },
     mapping: {
@@ -125,6 +126,8 @@ export var config = {
                 SEASON_YEAR: 2023,
                 NEXT_SEASON: "SPRING",
                 NEXT_YEAR: 2023,
+                oath_id: -1,
+                oath_secret: "",
                 disabled: false,
                 wait: 350
             }

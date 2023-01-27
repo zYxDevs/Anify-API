@@ -1,7 +1,7 @@
 import API, { ProviderType } from "./API";
 import StringSimilarity from "./libraries/StringSimilarity";
 import { config } from "./config";
-import AniList, { Format, Genres, Media, Type } from "./providers/meta/AniList";
+import AniList, { Format, Genres, Media, Type, UserResponse } from "./providers/meta/AniList";
 import { Episode, SearchResponse, SubbedSource } from "./providers/anime/Anime";
 import TMDB from "./providers/meta/TMDB";
 import ComicK from "./providers/manga/ComicK";
@@ -539,6 +539,37 @@ export default class AniSync extends API {
             possible = await manga.get(id);
         }
         return possible;
+    }
+
+    public async getList(userId:number, type:Type["ANIME"]|Type["MANGA"]) {
+        const aniList = new AniList();
+        const data = await aniList.getList(userId, type);
+
+        const result = [];
+        
+        for (let i = 0; i < data.data.MediaListCollection.lists.length; i++) {
+            const list = data.data.MediaListCollection.lists[i];
+            const toPush = {
+                name: list.name,
+                media: []
+            }
+
+            for (let j = 0; j < list.entries.length; j++) {
+                const media = list.entries[j].media;
+                const possible = await this.get(media.id.toString());
+                if (possible) {
+                    toPush.media.push(possible);
+                }
+            }
+            result.push(toPush);
+        }
+        return result;
+    }
+
+    public async getUserInfo(username:string):Promise<UserResponse> {
+        const aniList = new AniList();
+        const user = await aniList.getUser(username);
+        return user;
     }
 
     public async getEpisodes(id:string): Promise<ProviderEpisodes[]> {

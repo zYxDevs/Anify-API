@@ -10,6 +10,7 @@ import AniSync from "../AniSync";
 import Anime from "../providers/anime/Anime";
 import Manga from "../providers/manga/Manga";
 import Novels from "../providers/Novels";
+import AniList from "../providers/meta/AniList";
 import TMDB from "../providers/meta/TMDB";
 
 const aniSync = new AniSync();
@@ -107,7 +108,7 @@ fastify.get("/stats", async(req, res) => {
     }
 })
 
-fastify.get("/list/:type", async(req, res) => {
+fastify.get("/all/:type", async(req, res) => {
     const type = req.params["type"];
 
     if (!type) {
@@ -141,7 +142,7 @@ fastify.get("/list/:type", async(req, res) => {
     }
 })
 
-fastify.post("/list", async(req, res) => {
+fastify.post("/all", async(req, res) => {
     const type = req.body["type"];
 
     if (!type) {
@@ -173,6 +174,102 @@ fastify.post("/list", async(req, res) => {
         res.type("application/json").code(404);
         return { error: "Unknown type." };
     }
+})
+
+fastify.get("/login", async(req, res) => {
+    //res.redirect(303, `https://anilist.co/api/v2/oauth/authorize?client_id=${config.mapping.provider.AniList.oath_id}&response_type=token`);
+    res.redirect(303, `https://anilist.co/api/v2/oauth/authorize?client_id=${config.mapping.provider.AniList.oath_id}&redirect_uri=${config.web_server.url + "/auth"}&response_type=code`)
+});
+
+fastify.get("/auth", async(req, res) => {
+    const code = req.query["code"];
+    const aniList = new AniList();
+    const token = await aniList.auth(code);
+    res.type("application/json").code(200);
+    return { token: token.access_token };
+});
+
+fastify.get("/user/:username", async(req, res) => {
+    const name = req.params["username"];
+
+    if (!name) {
+        res.type("application/json").code(400);
+        return { error: "No username provided." };
+    }
+
+    const aniList = new AniList();
+    const list = await aniList.getUser(name);
+    res.type("application/json").code(200);
+    return list;
+})
+
+fastify.post("/user", async(req, res) => {
+    const name = req.body["username"];
+
+    if (!name) {
+        res.type("application/json").code(400);
+        return { error: "No username provided." };
+    }
+
+    const aniList = new AniList();
+    const list = await aniList.getUser(name);
+    res.type("application/json").code(200);
+    return list;
+})
+
+fastify.post("/update_list", async(req, res) => {
+    const token = req.body["token"];
+    const variables = req.body["variables"];
+
+    if (!token || !variables) {
+        res.type("application/json").code(400);
+        return { error: "No token or variables provided." };
+    }
+
+    const aniList = new AniList();
+    const list = await aniList.updateList(variables, token);
+    res.type("application/json").code(200);
+    return list;
+})
+
+fastify.get("/list/:userId/:type", async(req, res) => {
+    const userId = req.params["userId"];
+    let type = req.params["type"];
+
+    if (!userId || !type) {
+        res.type("application/json").code(400);
+        return { error: "No user ID or type provided." };
+    }
+
+    if (type.toLowerCase() != "anime" && type.toLowerCase() != "manga") {
+        res.type("application/json").code(400);
+        return { error: "Unknown type." };
+    }
+    type = type.toUpperCase();
+
+    const list = await aniSync.getList(userId, type);
+    res.type("application/json").code(200);
+    return list;
+})
+
+fastify.post("/list/:userId/:type", async(req, res) => {
+    const userId = req.body["userId"];
+    let type = req.body["type"];
+
+    if (!userId || !type) {
+        res.type("application/json").code(400);
+        return { error: "No user ID or type provided." };
+    }
+
+    if (type.toLowerCase() != "anime" && type.toLowerCase() != "manga") {
+        res.type("application/json").code(400);
+        return { error: "Unknown type." };
+    }
+    type = type.toUpperCase();
+
+    const list = await aniSync.getList(userId, type);
+    res.type("application/json").code(200);
+    return list;
 })
 
 fastify.get("/popular/:type", async(req, res) => {

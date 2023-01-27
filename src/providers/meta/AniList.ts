@@ -456,8 +456,410 @@ export default class AniList extends API {
             throw new Error(e.message);
         }
     }
+
+    public async auth(code:string): Promise<AuthResponse> {
+        const options = {
+            uri: 'https://anilist.co/api/v2/oauth/token',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            json: {
+                'grant_type': 'authorization_code',
+                'client_id': this.config.oath_id,
+                'client_secret': this.config.oath_secret,
+                'redirect_uri': config.web_server.url + "/auth", // http://example.com/callback
+                'code': code, // The Authorization Code received previously
+            }
+        };
+
+        const req = await this.fetch(options.uri, {
+            body: JSON.stringify(options.json),
+            method: options.method,
+            headers: options.headers
+        }).catch((err) => {
+            console.error(err);
+            return null;
+        });
+        const data = req.json();
+        return data;
+    }
+
+    public async getUser(username:string): Promise<UserResponse> {
+        const options = {
+            uri: this.api,
+            method: 'POST',
+            json: {
+                query: `
+                query($id: Int, $name: String) {
+                    User(id: $id, name: $name) {
+                        id name previousNames {
+                            name updatedAt
+                        }
+                        avatar {
+                            large
+                        }
+                        bannerImage about isFollowing isFollower donatorTier donatorBadge createdAt moderatorRoles isBlocked bans options {
+                            profileColor restrictMessagesToFollowing
+                        }
+                        mediaListOptions {
+                            scoreFormat
+                        }
+                        statistics {
+                            anime {
+                                count meanScore standardDeviation minutesWatched episodesWatched genrePreview: genres(limit: 10, sort: COUNT_DESC) {
+                                    genre count
+                                }
+                            }
+                            manga {
+                                count meanScore standardDeviation chaptersRead volumesRead genrePreview: genres(limit: 10, sort: COUNT_DESC) {
+                                    genre count
+                                }
+                            }
+                        }
+                        stats {
+                            activityHistory {
+                                date amount level
+                            }
+                        }
+                        favourites {
+                            anime {
+                                edges {
+                                    favouriteOrder node {
+                                        id type status(version: 2) format isAdult bannerImage title {
+                                            userPreferred
+                                        }
+                                        coverImage {
+                                            large
+                                        }
+                                        startDate {
+                                            year
+                                        }
+                                    }
+                                }
+                            }
+                            manga {
+                                edges {
+                                    favouriteOrder node {
+                                        id type status(version: 2) format isAdult bannerImage title {
+                                            userPreferred
+                                        }
+                                        coverImage {
+                                            large
+                                        }
+                                        startDate {
+                                            year
+                                        }
+                                    }
+                                }
+                            }
+                            characters {
+                                edges {
+                                    favouriteOrder node {
+                                        id name {
+                                            userPreferred
+                                        }
+                                        image {
+                                            large
+                                        }
+                                    }
+                                }
+                            }
+                            staff {
+                                edges {
+                                    favouriteOrder node {
+                                        id name {
+                                            userPreferred
+                                        }
+                                        image {
+                                            large
+                                        }
+                                    }
+                                }
+                            }
+                            studios {
+                                edges {
+                                    favouriteOrder node {
+                                        id name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                `,
+                variables: {
+                    "name": username,
+                }
+            }
+        };
+
+        const req = await this.fetch(options.uri, {
+            body: JSON.stringify(options.json),
+            method: options.method,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }).catch((err) => {
+            console.error(err);
+            return null;
+        });
+        const data = req.json();
+        return data;
+    }
+
+    public async getList(userId:number, type?:Type["ANIME"]|Type["MANGA"]):Promise<ListResponse> {
+        type = type ? type : "ANIME";
+        const aniListArgs = {
+            query: `
+                query($userId: Int, $userName: String, $type: MediaType) {
+                MediaListCollection(userId: $userId, userName: $userName, type: $type) {
+                    lists {
+                        name isCustomList isCompletedList: isSplitCompletedList entries {
+                            ...mediaListEntry
+                        }
+                    }
+                    user {
+                        id name avatar {
+                            large
+                        }
+                        mediaListOptions {
+                            scoreFormat rowOrder animeList {
+                                sectionOrder customLists splitCompletedSectionByFormat theme
+                            }
+                            mangaList {
+                                sectionOrder customLists splitCompletedSectionByFormat theme
+                            }
+                        }
+                    }
+                }
+            }
+            fragment mediaListEntry on MediaList {
+                id mediaId status score progress progressVolumes repeat priority private hiddenFromStatusLists customLists advancedScores notes updatedAt startedAt {
+                    year month day
+                }
+                completedAt {
+                    year month day
+                }
+                media {
+                    id title {
+                        userPreferred romaji english native
+                    }
+                    coverImage {
+                        extraLarge large
+                    }
+                    type format status(version: 2) episodes volumes chapters averageScore popularity isAdult countryOfOrigin genres bannerImage startDate {
+                        year month day
+                    }
+                }
+            }`,
+            variables: {
+                userId: userId,
+                type: type
+            }
+        }
+
+        const req = await this.fetch(this.api, {
+            body: JSON.stringify(aniListArgs),
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).catch((err) => {
+            console.error(err);
+            return null;
+        });
+        if (!req) {
+            return null;
+        }
+        const data = req.json();
+        return data;
+    }
+
+    public async updateList(variables:ListVariables, token:string):Promise<UpdateResponse> {
+        const aniListArgs = {
+            query: `
+            mutation($id: Int $mediaId: Int $status: MediaListStatus $score: Float $progress: Int $progressVolumes: Int $repeat: Int $private: Boolean $notes: String $customLists: [String] $hiddenFromStatusLists: Boolean $advancedScores: [Float] $startedAt: FuzzyDateInput $completedAt: FuzzyDateInput) {
+                SaveMediaListEntry(id: $id mediaId: $mediaId status: $status score: $score progress: $progress progressVolumes: $progressVolumes repeat: $repeat private: $private notes: $notes customLists: $customLists hiddenFromStatusLists: $hiddenFromStatusLists advancedScores: $advancedScores startedAt: $startedAt completedAt: $completedAt) {
+                    id mediaId status score advancedScores progress progressVolumes repeat priority private hiddenFromStatusLists customLists notes updatedAt startedAt {
+                        year month day
+                    }
+                    completedAt {
+                        year month day
+                    }
+                    user {
+                        id name
+                    }
+                    media {
+                        id title {
+                            userPreferred
+                        }
+                        coverImage {
+                            large
+                        }
+                        type format status episodes volumes chapters averageScore popularity isAdult startDate {
+                            year
+                        }
+                    }
+                }
+            }
+            `,
+            variables: variables
+        }
+        const req = await this.fetch(this.api, {
+            body: JSON.stringify(aniListArgs),
+            method: "POST",
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+        }).catch((err) => {
+            console.error(err);
+            return null;
+        });
+        if (!req) {
+            return null;
+        }
+        const data = req.json();
+        return data;
+    }
 }
 
+interface ListResponse {
+    data: {
+        MediaListCollection: {
+            lists: [List];
+            user: {
+                id: number;
+                name: string;
+                avatar: {
+                    large: string;
+                };
+                mediaListOptions: {
+                    scoreFormat: string;
+                    rowOrder: string;
+                    animeList: {
+                        sectionOrder: [string];
+                        customLists: [string];
+                        splitCompletedSectionByFormat: boolean;
+                        theme: {
+                            themeType: string;
+                            theme: string;
+                            coverImages: string;
+                        };
+                    };
+                    mangaList: {
+                        sectionOrder: [string];
+                        customLists: [string];
+                        splitCompletedSectionByFormat: boolean;
+                        theme: {
+                            themeType: string;
+                            theme: string;
+                            coverImages: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+}
+
+interface List {
+    name: string;
+    isCustomList: boolean;
+    isCompleteList: boolean;
+    entries: [ListEntry];
+}
+
+interface ListEntry {
+    id: number;
+    mediaId: number;
+    status: string;
+    score: number;
+    progress: number;
+    progressVolumes?: number;
+    repeat: number;
+    priority: number;
+    private: boolean;
+    hiddenFromStatusLists: boolean;
+    customLists?: [string];
+    advancedScores: {
+        Story: number;
+        Characters: number;
+        Visuals: number;
+        Audio: number;
+        Enjoyment: number;
+    };
+    notes?: string;
+    updatedAt: number;
+    startedAt: {
+        year?: number;
+        month?: number;
+        day?: number;
+    };
+    completedAt: {
+        year?: number;
+        month?: number;
+        day?: number;
+    };
+    media: {
+        id: number;
+        title: Title;
+        coverImage: {
+            extraLarge: string;
+            large: string;
+        };
+        type: Type["ANIME"]|Type["MANGA"];
+        format: Format;
+        status: string;
+        episodes: number;
+        volumes?: number;
+        chapters?: number;
+        averageScore: number;
+        popularity: number;
+        isAdult: boolean;
+        countryOfOrigin: string;
+        genres: [string];
+        bannerImage: string;
+        startDate: {
+            year?: number;
+            month?: number;
+            day?: number;
+        };
+    }
+}
+
+interface UpdateResponse {
+    data: {
+        SaveMediaListEntry: ListVariables;
+    }
+}
+
+interface ListVariables {
+    id?: number;
+    mediaId: number|string;
+    progress?: number;
+    progressVolumes?: number;
+    score?: number;
+    repeat?: number;
+    priority?: number;
+    private?: boolean;
+    notes?: string;
+    status?: Status;
+    hiddenFromStatusLists?: boolean;
+    customLists?: [string];
+    advancedScored?: [number];
+    startedAt?: number;
+    completedAt?: number;
+}
+
+interface AuthResponse {
+    token_type: string;
+    expires_in: number;
+    access_token: string;
+}
 interface Type {
     ANIME: "ANIME",
     MANGA: "MANGA"
@@ -516,6 +918,15 @@ export enum Genres {
     SPORTS = "Sports",
     SUPERNATURAL = "Supernatural",
     THRILLER = "Thriller"
+}
+
+export enum Status {
+    CURRENT = "CURRENT",
+    PLANNING = "PLANNING",
+    COMPLETED = "COMPLETED",
+    DROPPED = "DROPPED",
+    PAUSED = "PAUSED",
+    REPEATING = "REPEATING"
 }
 
 interface AniListResponse {
@@ -684,4 +1095,138 @@ interface SeasonalResponse {
     }
 }
 
-export type { Type, Media, SearchResponse, SeasonalResponse };
+interface UserResponse {
+    data: {
+        User: {
+            id:number;
+            name: string;
+            previousNames: [string];
+            avatar: {
+                large:string;
+            };
+            bannerImage: string;
+            about: string;
+            isFollowing: boolean;
+            isFollower: boolean;
+            donatorTier: number;
+            donatorBadge: string;
+            createdAt: number;
+            moderatorRoles?: [string];
+            isBlocked: boolean;
+            bans: [string];
+            options: {
+                titleLanguage: string;
+                displayAdultContent: boolean;
+                airingNotifications: boolean;
+                profileColor: string;
+                notificationOptions: {
+                    activityReply: boolean;
+                    activityMention: boolean;
+                    activitySubscribed: boolean;
+                    activityReplySubscribed: boolean;
+                    activityLike: boolean;
+                    activityReplyLike: boolean;
+                    activityMentionSubscribed: boolean;
+                    activityReplies: boolean;
+                    activityReplyLikes: boolean;
+                    following: boolean;
+                    threadCommentMention: boolean;
+                    threadSubscribed: boolean;
+                    threadCommentReply: boolean;
+                    threadCommentSubscribed: boolean;
+                    threadLike: boolean;
+                    threadCommentLike: boolean;
+                    threadCommentReplySubscribed: boolean;
+                    threadCommentLikes: boolean;
+                    relatedMediaAddition: boolean;
+                    mediaList: boolean;
+                    airing: boolean;
+                    relatedMediaAnnouncement: boolean;
+                    activityMessage: boolean;
+                    activityMessageSubscribed: boolean;
+                    activityMessageReply: boolean;
+                    activityMessageReplySubscribed: boolean;
+                    activityMessageLike: boolean;
+                    activityMessageReplyLike: boolean;
+                    activityMessageReplies: boolean;
+                    activityMessageReplyLikes: boolean;
+                    threadComment: boolean;
+                    thread: boolean;
+                    activity: boolean;
+                };
+            };
+            mediaListOptions: {
+                scoreFormat: string;
+                rowOrder: string;
+                animeList: {
+                    sectionOrder: [string];
+                    splitCompletedSectionByFormat: boolean;
+                    customLists: [string];
+                    advancedScoring: [string];
+                    advancedScoringEnabled: boolean;
+                };
+                mangaList: {
+                    sectionOrder: [string];
+                    splitCompletedSectionByFormat: boolean;
+                    customLists: [string];
+                    advancedScoring: [string];
+                    advancedScoringEnabled: boolean;
+                };
+            };
+            statistics: {
+                anime: {
+                    count: number;
+                    meanScore: number;
+                    standardDeviation: number;
+                    minutesWatched: number;
+                    episodesWatched: number;
+                    genres: [string];
+                    tags: [string];
+                    formats: [string];
+                    statuses: [string];
+                    releaseYears: [string];
+                    startYears: [string];
+                    countries: [string];
+                    voiceActors: [string];
+                    staff: [string];
+                    studios: [string];
+                };
+                manga: {
+                    count: number;
+                    meanScore: number;
+                    standardDeviation: number;
+                    chaptersRead: number;
+                    volumesRead: number;
+                    genres: [string];
+                    tags: [string];
+                    formats: [string];
+                    statuses: [string];
+                    releaseYears: [string];
+                    startYears: [string];
+                    countries: [string];
+                    staff: [string];
+                    studios: [string];
+                };
+            };
+            favourites: {
+                anime: {
+                    nodes: [Media];
+                }
+                manga: {
+                    nodes: [Media];
+                }
+                characters: {
+                    nodes: [Media];
+                }
+                staff: {
+                    nodes: [Media];
+                }
+                studios: {
+                    nodes: [Media];
+                }
+            };
+        };
+    };
+}
+
+export type { Type, Media, SearchResponse, SeasonalResponse, UserResponse };
