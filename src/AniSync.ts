@@ -647,7 +647,9 @@ export default class AniSync extends API {
         }
         const data = await provider.getSources(watchId);
         sources = data;
-        anime.cacheSources(id, watchId, sources);
+        if (sources.sources.length > 0) {
+            anime.cacheSources(id, watchId, sources);
+        }
         return sources;
     }
 
