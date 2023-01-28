@@ -7,7 +7,7 @@ import fastifySwagger from "@fastify/swagger";
 import { config } from "../config";
 
 import AniSync from "../AniSync";
-import Anime from "../providers/anime/Anime";
+import Anime, { SubbedSource } from "../providers/anime/Anime";
 import Manga from "../providers/manga/Manga";
 import Novels from "../providers/Novels";
 import AniList from "../providers/meta/AniList";
@@ -752,7 +752,17 @@ fastify.post("/sources", async(req, res) => {
         return { error: "Invalid request!" };
     }
 
-    const sources = await aniSync.getSources(id, provider, watchId);
+    const sources = await aniSync.getSources(id, provider, watchId).catch((err) => {
+        const result:SubbedSource = {
+            sources: [],
+            subtitles: [],
+            intro: {
+                start: 0,
+                end: 0
+            }
+        }
+        return result;
+    });
 
     res.type("application/json").code(200);
     return sources;

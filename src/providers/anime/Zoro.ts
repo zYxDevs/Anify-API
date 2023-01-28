@@ -147,7 +147,7 @@ export default class Zoro extends Anime {
     }
 
     private retrieveServerId ($: any, index: number, subOrDub: SuborDub) {
-        return $(`div.ps_-block.ps_-block-sub.servers-${subOrDub} > div.ps__-list > div`).map((i: any, el: any) => ($(el).attr('data-server-id') === `${index}` ? $(el) : null)).get()[0].attr('data-id')!;
+        return $(`div.ps_-block.ps_-block-sub.servers-${subOrDub} > div.ps__-list > div`).map((i: any, el: any) => ($(el).attr('data-server-id') === `${index}` ? $(el) : null)).get()[0]?.attr('data-id')!;
     };
 }
 

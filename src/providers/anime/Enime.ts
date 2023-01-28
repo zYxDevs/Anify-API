@@ -111,6 +111,9 @@ export default class Enime extends Anime {
             }
         });
         const resolutions = resResult.text().match(/(RESOLUTION=)(.*)(\s*?)(\s*.*)/g);
+        if (!resolutions) {
+            return response;
+        }
         resolutions.forEach((ress: string) => {
             const index = url.lastIndexOf('/');
             const quality = ress.split('\n')[0].split('x')[1].split(',')[0];
