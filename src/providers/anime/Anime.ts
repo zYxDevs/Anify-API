@@ -323,10 +323,17 @@ export default class Anime extends API {
 
         if (!isJson(sources)) {
             const req = await this.fetch(
-                'https://raw.githubusercontent.com/consumet/rapidclown/main/key.txt'
+                'https://github.com/enimax-anime/key/blob/e6/key.txt'
             );
 
-            const key = req.text();
+            const data = req.text();
+            let key = this.substringBefore(this.substringAfter(data, '"blob-code blob-code-inner js-file-line">'), '</td>');
+            if (!key) {
+                key = await (await this.fetch("https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt")).text();
+            }
+            if (!key) {
+                key = "c1d17096f2ca11b7";
+            }
             try {
                 sources = JSON.parse(CryptoJS.AES.decrypt(sources, key).toString(CryptoJS.enc.Utf8));
             } catch {
@@ -465,6 +472,16 @@ export default class Anime extends API {
         stmt.run();
         stmt.finalize();
     }
+
+    private substringBefore = (str: string, toFind: string) => {
+        const index = str.indexOf(toFind);
+        return index == -1 ? '' : str.substring(0, index);
+    };
+
+    private substringAfter = (str: string, toFind: string) => {
+        const index = str.indexOf(toFind);
+        return index == -1 ? '' : str.substring(index + toFind.length);
+    };
 }
 
 interface SearchResponse {
