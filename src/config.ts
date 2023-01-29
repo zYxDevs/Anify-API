@@ -6,6 +6,8 @@ export var config = {
         port: 3060,
         url: "https://api.anify.tv",
         //url: "http://localhost:3060",
+        main_url: "https://anify.tv",
+        //main_url: "http://localhost:3000",
         cors: ["https://anifytv.vercel.app", "https://anify.club", "https://api.anify.club", "https://anify.tv", "https://api.anify.tv", "http://localhost:3000", "http://localhost:3060"]
     },
     mapping: {
