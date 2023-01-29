@@ -4,10 +4,9 @@ export var config = {
         use_http: false,
         password: "Corelia63^#", // Encryption/decryption password. Not important (this password is leaked by the way, so don't try to use it for anything lol)
         port: 3060,
-        url: "https://api.anify.tv",
-        //url: "http://localhost:3060",
-        main_url: "https://anify.tv",
-        //main_url: "http://localhost:3000",
+        //url: "https://api.anify.tv",
+        url: "http://localhost:3060",
+        main_url: "http://localhost:3000",
         cors: ["https://anifytv.vercel.app", "https://anify.club", "https://api.anify.club", "https://anify.tv", "https://api.anify.tv", "http://localhost:3000", "http://localhost:3060"]
     },
     mapping: {

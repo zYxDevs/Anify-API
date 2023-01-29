@@ -186,7 +186,21 @@ fastify.get("/auth", async(req, res) => {
     const aniList = new AniList();
     const token = await aniList.auth(code);
     res.type("application/json").code(200);
-    return { token: token.access_token };
+    res.redirect(303, `${config.web_server.main_url}/auth?token=${token.access_token}`)
+});
+
+fastify.post("/viewer", async(req, res) => {
+    const token = req.body["token"];
+
+    if (!token) {
+        res.type("application/json").code(400);
+        return { error: "No token provided." };
+    }
+
+    const aniList = new AniList();
+    const user = await aniList.getViewer(token);
+    res.type("application/json").code(200);
+    return user;
 });
 
 fastify.get("/user/:username", async(req, res) => {

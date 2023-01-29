@@ -609,6 +609,178 @@ export default class AniList extends API {
         return data;
     }
 
+    public async getViewer(token:string): Promise<UserResponse> {
+        const options = {
+            uri: this.api,
+            method: 'POST',
+            json: {
+                query: `
+                query {
+                    Viewer {
+                        id
+                        name
+                        previousNames {
+                            name
+                            updatedAt
+                        }
+                        avatar {
+                            large
+                        }
+                        bannerImage
+                        about
+                        isFollowing
+                        isFollower
+                        donatorTier
+                        donatorBadge
+                        createdAt
+                        moderatorRoles
+                        isBlocked
+                        bans
+                        options {
+                            profileColor
+                            restrictMessagesToFollowing
+                        }
+                        mediaListOptions {
+                            scoreFormat
+                        }
+                        statistics {
+                            anime {
+                                count
+                                meanScore
+                                standardDeviation
+                                minutesWatched
+                                episodesWatched
+                                genrePreview: genres(limit: 10, sort: COUNT_DESC) {
+                                    genre
+                                    count
+                                }
+                            }
+                            manga {
+                                count
+                                meanScore
+                                standardDeviation
+                                chaptersRead
+                                volumesRead
+                                genrePreview: genres(limit: 10, sort: COUNT_DESC) {
+                                    genre
+                                    count
+                                }
+                            }
+                        }
+                        stats {
+                            activityHistory {
+                                date
+                                amount
+                                level
+                            }
+                        }
+                        favourites {
+                            anime {
+                                edges {
+                                    favouriteOrder
+                                    node {
+                                        id
+                                        type
+                                        status(version: 2)
+                                        format
+                                        isAdult
+                                        bannerImage
+                                        title {
+                                            userPreferred
+                                        }
+                                        coverImage {
+                                            large
+                                        }
+                                        startDate {
+                                            year
+                                        }
+                                    }
+                                }
+                            }
+                            manga {
+                                edges {
+                                    favouriteOrder
+                                    node {
+                                        id
+                                        type
+                                        status(version: 2)
+                                        format
+                                        isAdult
+                                        bannerImage
+                                        title {
+                                            userPreferred
+                                        }
+                                        coverImage {
+                                            large
+                                        }
+                                        startDate {
+                                            year
+                                        }
+                                    }
+                                }
+                            }
+                            characters {
+                                edges {
+                                    favouriteOrder
+                                    node {
+                                        id
+                                        name {
+                                            userPreferred
+                                        }
+                                        image {
+                                            large
+                                        }
+                                    }
+                                }
+                            }
+                            staff {
+                                edges {
+                                    favouriteOrder
+                                    node {
+                                        id
+                                        name {
+                                            userPreferred
+                                        }
+                                        image {
+                                            large
+                                        }
+                                    }
+                                }
+                            }
+                            studios {
+                                edges {
+                                    favouriteOrder
+                                    node {
+                                        id
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                `,
+                variables: {
+                }
+            }
+        };
+
+        const req = await this.fetch(options.uri, {
+            body: JSON.stringify(options.json),
+            method: options.method,
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+        }).catch((err) => {
+            console.error(err);
+            return null;
+        });
+        const data = req.json();
+        return data;
+    }
+
     public async getList(userId:number, type?:Type["ANIME"]|Type["MANGA"]):Promise<ListResponse> {
         type = type ? type : "ANIME";
         const aniListArgs = {
