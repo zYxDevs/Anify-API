@@ -266,7 +266,7 @@ fastify.get("/list/:userId/:type", async(req, res) => {
     return list;
 })
 
-fastify.post("/list/:userId/:type", async(req, res) => {
+fastify.post("/list", async(req, res) => {
     const userId = req.body["userId"];
     let type = req.body["type"];
 
