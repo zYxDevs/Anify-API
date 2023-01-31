@@ -17,6 +17,7 @@ import { Chapter, Page } from "./providers/manga/Manga";
 import Kitsu from "./providers/meta/Kitsu";
 import * as colors from "colors";
 import MangaSee from "./providers/manga/MangaSee";
+import MangaPark from "./providers/manga/MangaPark";
 
 export default class AniSync extends API {
     private stringSim:StringSimilarity = new StringSimilarity();
@@ -33,6 +34,7 @@ export default class AniSync extends API {
         const mangadex = new MangaDex();
         const mangakakalot = new Mangakakalot();
         const mangaSee = new MangaSee();
+        const mangaPark = new MangaPark();
         const gogoAnime = new GogoAnime();
         const animeFox = new AnimeFox();
         const animePahe = new AnimePahe();
@@ -60,6 +62,10 @@ export default class AniSync extends API {
             {
                 name: mangaSee.providerName,
                 object: mangaSee
+            },
+            {
+                name: mangaPark.providerName,
+                object: mangaPark
             },
             {
                 name: gogoAnime.providerName,

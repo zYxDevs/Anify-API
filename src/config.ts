@@ -105,6 +105,22 @@ export var config = {
                 partial_amount: 1,
                 disabled: false
             },
+            MangaPark: {
+                threshold: 0.85,
+                comparison_threshold: 0.8,
+                wait: 200,
+                search_partial: false,
+                partial_amount: 1,
+                disabled: false
+            },
+            MangaSee: {
+                threshold: 0.85,
+                comparison_threshold: 0.8,
+                wait: 200,
+                search_partial: false,
+                partial_amount: 1,
+                disabled: false
+            },
             TMDB: {
                 api_key: "5201b54eb0968700e693a30576d7d4dc",
                 threshold: 0.6,
