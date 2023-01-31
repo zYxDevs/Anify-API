@@ -34,8 +34,8 @@ export var config = {
                 disabled: true
             },
             Zoro: {
-                threshold: 0.7,
-                comparison_threshold: 0.55,
+                threshold: 0.86,
+                comparison_threshold: 0.8,
                 wait: 200,
                 search_partial: true,
                 partial_amount: 0.95,
@@ -43,8 +43,8 @@ export var config = {
             },
             // Gogo only provides romaji titles.
             GogoAnime: {
-                threshold: 0.65,
-                comparison_threshold: 0.65,
+                threshold: 0.8,
+                comparison_threshold: 0.8,
                 wait: 200,
                 search_partial: true,
                 partial_amount: 0.75,
@@ -53,16 +53,16 @@ export var config = {
             // AnimeFox as well. AnimeFox is essentially Zoro but
             // with GogoAnime sources/data.
             AnimeFox: {
-                threshold: 0.65,
-                comparison_threshold: 0.45,
+                threshold: 0.79,
+                comparison_threshold: 0.8,
                 wait: 200,
                 search_partial: true,
                 partial_amount: 0.85,
                 disabled: false
             },
             AnimePahe: {
-                threshold: 0.6,
-                comparison_threshold: 0.5,
+                threshold: 0.95,
+                comparison_threshold: 0.85,
                 wait: 200,
                 search_partial: true,
                 partial_amount: 0.75,
@@ -160,7 +160,7 @@ export var config = {
             max_pages: 9999,
             ids_per_page: 20, // How many IDs to crawl through per-page
             //start: 682 // bookmark manga
-            start: 63 // bookmark anime
+            start: 0 // bookmark anime
         }
     },
     anime: {

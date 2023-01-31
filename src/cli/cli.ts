@@ -138,6 +138,7 @@ async function search() {
     const results = await aniSync.search(cliFlags.query, cliFlags.type === "anime" ? "ANIME" : "MANGA");
     console.log(colors.white("Received " + colors.cyan(String(results.length)) + " results."));
     results.map((result) => {
+        console.log(result.connectors)
         console.log(colors.gray(result.anilist.title.english || result.anilist.title.romaji || result.anilist.title.native) + " (" + colors.cyan(String(result.id)) + ")");
     });
 }
