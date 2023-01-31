@@ -469,8 +469,8 @@ export default class AniList extends API {
                 'grant_type': 'authorization_code',
                 'client_id': this.config.oath_id,
                 'client_secret': this.config.oath_secret,
-                'redirect_uri': config.web_server.url + "/auth", // http://example.com/callback
-                'code': code, // The Authorization Code received previously
+                'redirect_uri': config.web_server.url + "/auth",
+                'code': code,
             }
         };
 

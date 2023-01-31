@@ -177,7 +177,6 @@ fastify.post("/all", async(req, res) => {
 })
 
 fastify.get("/login", async(req, res) => {
-    //res.redirect(303, `https://anilist.co/api/v2/oauth/authorize?client_id=${config.mapping.provider.AniList.oath_id}&response_type=token`);
     res.redirect(303, `https://anilist.co/api/v2/oauth/authorize?client_id=${config.mapping.provider.AniList.oath_id}&redirect_uri=${config.web_server.url + "/auth"}&response_type=code`)
 });
 
@@ -185,7 +184,6 @@ fastify.get("/auth", async(req, res) => {
     const code = req.query["code"];
     const aniList = new AniList();
     const token = await aniList.auth(code);
-    res.type("application/json").code(200);
     res.redirect(303, `${config.web_server.main_url}/auth?token=${token.access_token}`)
 });
 

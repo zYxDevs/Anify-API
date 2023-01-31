@@ -4,9 +4,10 @@ export var config = {
         use_http: false,
         password: "Corelia63^#", // Encryption/decryption password. Not important (this password is leaked by the way, so don't try to use it for anything lol)
         port: 3060,
-        //url: "https://api.anify.tv",
-        url: "http://localhost:3060",
-        main_url: "http://localhost:3000",
+        //url: "http://localhost:3060",
+        url: "https://api.anify.tv",
+        //main_url: "http://localhost:3000",
+        main_url: "https://anify.tv",
         cors: ["https://anifytv.vercel.app", "https://anify.club", "https://api.anify.club", "https://anify.tv", "https://api.anify.tv", "http://localhost:3000", "http://localhost:3060"]
     },
     mapping: {
@@ -33,7 +34,7 @@ export var config = {
                 disabled: true
             },
             Zoro: {
-                threshold: 0.65,
+                threshold: 0.7,
                 comparison_threshold: 0.55,
                 wait: 200,
                 search_partial: true,
@@ -53,7 +54,7 @@ export var config = {
             // with GogoAnime sources/data.
             AnimeFox: {
                 threshold: 0.65,
-                comparison_threshold: 0.5,
+                comparison_threshold: 0.45,
                 wait: 200,
                 search_partial: true,
                 partial_amount: 0.85,
@@ -61,7 +62,7 @@ export var config = {
             },
             AnimePahe: {
                 threshold: 0.6,
-                comparison_threshold: 0.65,
+                comparison_threshold: 0.5,
                 wait: 200,
                 search_partial: true,
                 partial_amount: 0.75,
@@ -158,8 +159,8 @@ export var config = {
             wait: 1000,
             max_pages: 9999,
             ids_per_page: 20, // How many IDs to crawl through per-page
-            //start: 682 // for manga
-            start: 0
+            //start: 682 // bookmark manga
+            start: 63 // bookmark anime
         }
     },
     anime: {
