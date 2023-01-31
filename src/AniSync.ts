@@ -16,6 +16,7 @@ import CrunchyRoll from "./providers/anime/CrunchyRoll";
 import { Chapter, Page } from "./providers/manga/Manga";
 import Kitsu from "./providers/meta/Kitsu";
 import * as colors from "colors";
+import MangaSee from "./providers/manga/MangaSee";
 
 export default class AniSync extends API {
     private stringSim:StringSimilarity = new StringSimilarity();
@@ -31,6 +32,7 @@ export default class AniSync extends API {
         const comicK = new ComicK();
         const mangadex = new MangaDex();
         const mangakakalot = new Mangakakalot();
+        const mangaSee = new MangaSee();
         const gogoAnime = new GogoAnime();
         const animeFox = new AnimeFox();
         const animePahe = new AnimePahe();
@@ -54,6 +56,10 @@ export default class AniSync extends API {
             {
                 name: mangakakalot.providerName,
                 object: mangakakalot
+            },
+            {
+                name: mangaSee.providerName,
+                object: mangaSee
             },
             {
                 name: gogoAnime.providerName,
