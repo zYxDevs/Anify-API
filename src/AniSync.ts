@@ -18,6 +18,8 @@ import Kitsu from "./providers/meta/Kitsu";
 import * as colors from "colors";
 import MangaSee from "./providers/manga/MangaSee";
 import MangaPark from "./providers/manga/MangaPark";
+import { createWriteStream } from "fs";
+import { join } from "path";
 
 export default class AniSync extends API {
     private stringSim:StringSimilarity = new StringSimilarity();
@@ -268,6 +270,16 @@ export default class AniSync extends API {
         start = start ? start : config.crawling.data.start;
         idsPerPage = idsPerPage ? idsPerPage : config.crawling.data.ids_per_page;
 
+        let errorStream = null;
+        let logStream = null;
+        let idsStream = null;
+        if (config.crawling.log_file) {
+            const date = new Date(Date.now());
+            errorStream = createWriteStream(join(__dirname, "../logs/" + date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay() + "-errors.log"));
+            logStream = createWriteStream(join(__dirname, "../logs/" + date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay() + "-log.log"));
+            idsStream = createWriteStream(join(__dirname, "../logs/" + date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay() + "-ids.txt"));
+        }
+
         if (type === "ANIME") {
             let canCrawl = true;
             const anime = new Zoro();
@@ -278,10 +290,20 @@ export default class AniSync extends API {
                 maxPages = pages;
             }
 
-            for (let i = start; i < maxPages && canCrawl; i++) {
+            if (config.crawling.log_file) {
+                const date = new Date(Date.now());
+                logStream.write("[" + date.toTimeString() + "] New Crawling Session For Anime" + "\n");
+                logStream.write("==============" + "\n");
+            }
+
+            for (let i = start; i < maxPages && canCrawl && ids.length; i++) {
                 const debugTimer = new Date(Date.now());
                 if (config.crawling.debug) {
                     console.log(colors.gray("Crawling page ") + i + colors.gray("..."));
+                }
+                if (config.crawling.log_file) {
+                    const date = new Date(Date.now());
+                    logStream.write("[" + date.toTimeString() + "] Crawling page " + i + "." + "\n");
                 }
 
                 const aniListMedia = [];
@@ -294,12 +316,21 @@ export default class AniSync extends API {
                             return null;
                         });
                         if (!aniListData) {
-                            console.log(colors.red("Can't get " + id + "."));
+                            if (config.crawling.debug) {
+                                console.log(colors.red("Can't get " + id + "."));
+                            }
+
+                            if (config.crawling.log_file) {
+                                const date = new Date(Date.now());
+                                errorStream.write("[" + date.toTimeString() + "] Unable to get AniList ID " + id + "\n");
+                                idsStream.write(id + "\n");
+                            }
                         } else {
                             const data = aniListData.data.Media;
-                            if (!data) {
-                                console.log(colors.red("No more data to crawl."));
-                                canCrawl = false;
+
+                            if (config.crawling.log_file) {
+                                const date = new Date(Date.now());
+                                logStream.write("[" + date.toTimeString() + "] Fetched data " + data.id + "." + "\n");
                             }
                             aniListMedia.push(data);
                         }
@@ -323,6 +354,12 @@ export default class AniSync extends API {
                     console.log(colors.white("Finished fetching data. Request took ") + colors.cyan(String(endTimer.getTime() - debugTimer.getTime())) + colors.white(" milliseconds."));
                 }
 
+                if (config.crawling.log_file) {
+                    const date = new Date(Date.now());
+                    const endTimer = new Date(Date.now());
+                    logStream.write("[" + date.toTimeString() + "] Finished fetching data. Request took " + (endTimer.getTime() - debugTimer.getTime()) + " milliseconds." + "\n");
+                }
+
                 await anime.insert(data);
 
                 if (config.crawling.debug) {
@@ -331,6 +368,12 @@ export default class AniSync extends API {
 
                 await this.wait(wait);
             }
+
+            if (config.crawling.log_file) {
+                const date = new Date(Date.now());
+                logStream.write("[" + date.toTimeString() + "] Finished crawling.");
+            }
+
             console.log(colors.cyan("Finished crawling!"));
         } else {
             const manga = new ComicK();
@@ -342,7 +385,13 @@ export default class AniSync extends API {
                 maxPages = pages;
             }
 
-            for (let i = start; i < maxPages && canCrawl; i++) {
+            if (config.crawling.log_file) {
+                const date = new Date(Date.now());
+                logStream.write("[" + date.toTimeString() + "] New Crawling Session For Manga" + "\n");
+                logStream.write("==============" + "\n");
+            }
+
+            for (let i = start; i < maxPages && canCrawl && ids.length; i++) {
                 const debugTimer = new Date(Date.now());
                 if (config.crawling.debug) {
                     console.log(colors.gray("Crawling page ") + i + colors.gray("..."));
@@ -358,22 +407,26 @@ export default class AniSync extends API {
                             return null;
                         });
                         if (!aniListData) {
-                            console.log(colors.red("Can't get " + id + "."));
+                            if (config.crawling.debug) {
+                                console.log(colors.red("Can't get " + id + "."));
+                            }
+
+                            if (config.crawling.log_file) {
+                                const date = new Date(Date.now());
+                                errorStream.write("[" + date.toTimeString() + "] Unable to get AniList ID " + id + "\n");
+                                idsStream.write(id + "\n");
+                            }
                         } else {
                             const data = aniListData.data.Media;
-                            if (!data) {
-                                console.log(colors.red("No more data to crawl."));
-                                canCrawl = false;
+
+                            if (config.crawling.log_file) {
+                                const date = new Date(Date.now());
+                                logStream.write("[" + date.toTimeString() + "] Fetched data " + data.id + "." + "\n");
                             }
                             aniListMedia.push(data);
                         }
                     }
                     await this.wait(config.mapping.provider.AniList.wait)
-                }
-
-                if (!aniListMedia || aniListMedia.length === 0) {
-                    console.log(colors.red("No more data to crawl."));
-                    canCrawl = false;
                 }
             
                 if (config.crawling.debug) {
@@ -393,8 +446,20 @@ export default class AniSync extends API {
                     console.log(colors.gray("Finished inserting manga."));
                 }
 
+                if (config.crawling.log_file) {
+                    const date = new Date(Date.now());
+                    const endTimer = new Date(Date.now());
+                    logStream.write("[" + date.toTimeString() + "] Finished fetching data. Request took " + (endTimer.getTime() - debugTimer.getTime()) + " milliseconds." + "\n");
+                }
+
                 await this.wait(wait);
             }
+
+            if (config.crawling.log_file) {
+                const date = new Date(Date.now());
+                logStream.write("[" + date.toTimeString() + "] Finished crawling.");
+            }
+
             console.log(colors.cyan("Finished crawling!"));
         }
     }
@@ -797,7 +862,7 @@ export default class AniSync extends API {
 
                     const possible = await this.getShow(String(aniData.id));
                     if (!possible) {
-                        const title = aniData.title.english ? aniData.title.english : aniData.title.romaji;
+                        const title = aniData.title.english && aniData.title.english.length > 0 ? aniData.title.english : aniData.title.romaji;
     
                         const aggregatorData:AggregatorData[] = await this.fetchData(title, type).catch((err) => {
                             console.error(err);
@@ -845,7 +910,7 @@ export default class AniSync extends API {
 
                     const possible = await this.getManga(String(aniData.id));
                     if (!possible) {
-                        const title = aniData.title.english;
+                        const title = aniData.title.english && aniData.title.english.length > 0 ? aniData.title.english : aniData.title.romaji;
     
                         const aggregatorData:AggregatorData[] = await this.fetchData(title, type).catch((err) => {
                             console.error(err);

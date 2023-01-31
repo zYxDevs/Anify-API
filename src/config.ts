@@ -34,7 +34,7 @@ export var config = {
             },
             Zoro: {
                 threshold: 0.65,
-                comparison_threshold: 0.4,
+                comparison_threshold: 0.55,
                 wait: 200,
                 search_partial: true,
                 partial_amount: 0.95,
@@ -42,8 +42,8 @@ export var config = {
             },
             // Gogo only provides romaji titles.
             GogoAnime: {
-                threshold: 0.6,
-                comparison_threshold: 0.5,
+                threshold: 0.65,
+                comparison_threshold: 0.65,
                 wait: 200,
                 search_partial: true,
                 partial_amount: 0.75,
@@ -107,7 +107,7 @@ export var config = {
             },
             MangaPark: {
                 threshold: 0.85,
-                comparison_threshold: 0.8,
+                comparison_threshold: 0.85,
                 wait: 200,
                 search_partial: false,
                 partial_amount: 1,
@@ -115,7 +115,7 @@ export var config = {
             },
             MangaSee: {
                 threshold: 0.85,
-                comparison_threshold: 0.8,
+                comparison_threshold: 0.85,
                 wait: 200,
                 search_partial: false,
                 partial_amount: 1,
@@ -153,10 +153,12 @@ export var config = {
     crawling: {
         database_path: "/Users/eltik/Documents/Coding/Anify-API/db.db",
         debug: true,
+        log_file: true,
         data: {
             wait: 1000,
-            max_pages: 10,
-            ids_per_page: 10, // How many IDs to crawl through per-page
+            max_pages: 9999,
+            ids_per_page: 20, // How many IDs to crawl through per-page
+            //start: 682 // for manga
             start: 0
         }
     },
