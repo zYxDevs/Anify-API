@@ -312,7 +312,7 @@ export default class Sync extends API {
                     if (fetched != null) {
                         chapters.push({
                             provider: provider.provider_name,
-                            episodes: fetched
+                            chapters: fetched
                         })   
                     }
                     resolve(true);

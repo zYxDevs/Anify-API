@@ -121,7 +121,7 @@ export default class DB extends API {
                 const exists = await this.get(data[i].id, type);
                 const newId:number = +data[i].id;
                 if (!exists) {
-                    const stmt = await this.db.prepare(`INSERT INTO ${type.toLowerCase()} (id, data, connectors) VALUES ($id, $data, $connectors)`);
+                    const stmt = await this.db.prepare(`INSERT OR IGNORE INTO ${type.toLowerCase()} (id, data, connectors) VALUES ($id, $data, $connectors)`);
                     await stmt.run({ $id: newId, $data: JSON.stringify(data[i].data), $connectors: JSON.stringify(data[i].connectors) });
                     await stmt.finalize();
 
