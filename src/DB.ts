@@ -141,7 +141,7 @@ export default class DB extends API {
         const parsedId:number = +id;
         const exists = await this.getContent(id, type);
         if (!exists) {
-            const stmt = await this.db.prepare(`INSERT INTO ${type === Type.ANIME ? "episodes" : "chapters"} (id, data, lastCached) VALUES ($id, $data, $lastCached)`);
+            const stmt = await this.db.prepare(`INSERT OR IGNORE INTO ${type === Type.ANIME ? "episodes" : "chapters"} (id, data, lastCached) VALUES ($id, $data, $lastCached)`);
             await stmt.run({ $id: parsedId, $data: JSON.stringify(data), $lastCached: new Date(Date.now()).getTime() });
             await stmt.finalize();
 
@@ -159,7 +159,7 @@ export default class DB extends API {
         const parsedId:number = +id;
         const exists = await this.getSources(id, mainId, type);
         if (!exists) {
-            const stmt = await this.db.prepare(`INSERT INTO ${type === Type.ANIME ? "sources" : "pages"} (id, ${type === Type.ANIME ? "watchId" : "readId"}, data, lastCached) VALUES ($id, $mainId, $data, $lastCached)`);
+            const stmt = await this.db.prepare(`INSERT OR IGNORE INTO ${type === Type.ANIME ? "sources" : "pages"} (id, ${type === Type.ANIME ? "watchId" : "readId"}, data, lastCached) VALUES ($id, $mainId, $data, $lastCached)`);
             await stmt.run({ $id: parsedId, $mainId: mainId, $data: JSON.stringify(data), $lastCached: new Date(Date.now()).getTime() });
             await stmt.finalize();
 
