@@ -14,7 +14,7 @@ import MangaSee from "./manga/MangaSee";
 import DB from "./DB";
 import * as config from "./config.json";
 import * as colors from "colors";
-import { Episode, SubbedSource } from "./Provider";
+import { Episode, Page, SubbedSource } from "./Provider";
 
 export default class Sync extends API {
     public aniList = new AniList();
@@ -374,13 +374,13 @@ export default class Sync extends API {
      * @param readId Read ID
      * @returns Promise<SubbedSource>
      */
-    public async getPages(id:string, providerName:string, readId:string): Promise<SubbedSource> {
+    public async getPages(id:string, providerName:string, readId:string): Promise<Page[]> {
         const provider = this.fetchProviderByName(providerName);
         if (!provider.provider) {
             return null;
         }
 
-        let sources:SubbedSource = null;
+        let sources:any = null;
 
         const possible = await this.db.getSources(id, readId, Type.MANGA);
         if (possible != null) {
@@ -395,7 +395,7 @@ export default class Sync extends API {
         }
         const data = await provider.provider.getPages(readId);
         sources = data;
-        if (sources.sources.length > 0) {
+        if (sources.length > 0) {
             await this.db.cacheSources(id, readId, sources, Type.MANGA);
         }
         return sources;
