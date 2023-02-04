@@ -28,10 +28,11 @@ export default class Sync extends API {
 
         // Class dictionary of all providers. Used for looping through and searching.
         this.classDictionary = [
-            {
-                name: "Zoro",
-                object: new Zoro(),
-            },
+            // Zoro has CloudFlare now
+            //{
+                //name: "Zoro",
+                //object: new Zoro(),
+            //},
             {
                 name: "AnimeFox",
                 object: new AnimeFox(),
@@ -585,6 +586,7 @@ export default class Sync extends API {
                     const result = await this.get(ids[i]).catch((err) => {
                         if (config.debug) {
                             console.log(colors.red("Error fetching ID from providers: ") + colors.white(ids[i] + ""));
+                            console.log(colors.gray(err.message));
                         }
                         return null;
                     });
