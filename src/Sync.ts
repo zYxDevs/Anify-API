@@ -636,6 +636,7 @@ export default class Sync extends API {
                     const retEl = anime[best.index];
                     results.push({
                         id: retEl.url,
+                        num: retEl.episodeNumber,
                         data: best.aniList,
                         similarity: best.similarity,
                     });
@@ -668,12 +669,22 @@ export default class Sync extends API {
             for (let j = 0; j < formatted.length; j++) {
                 if (formatted[j].data.id === item.data.id) {
                     hasPushed = true;
-                    formatted[j].connectors.push(
-                        {
-                            id: item.id,
-                            similarity: item.similarity
-                        }
-                    );
+                    if (item.num) {
+                        formatted[j].connectors.push(
+                            {
+                                id: item.id,
+                                num: item.num ?? -1,
+                                similarity: item.similarity
+                            }
+                        ); 
+                    } else {
+                        formatted[j].connectors.push(
+                            {
+                                id: item.id,
+                                similarity: item.similarity
+                            }
+                        ); 
+                    }
                 }
             }
             if (!hasPushed) {
@@ -683,12 +694,18 @@ export default class Sync extends API {
                         similarity: item.similarity
                     }
                 ];
+                if (item.num) {
+                    item.connectors[0].num = item.num;
+                }
                 item.id = item.data.id;
                 const temp = {
                     id: item.id,
                     data: item.data,
                     connectors: item.connectors,
                 };
+                if (item.num) {
+                    temp.connectors[0].num = item.num;
+                }
                 formatted.push(temp);
             }
         }
