@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import cors from '@fastify/cors';
 import fastifyFormbody from "@fastify/formbody";
 import fastifyRateLimit from "@fastify/rate-limit";
+import fastifyCaching from "@fastify/caching";
 
 import * as config from "./config.json";
 
@@ -44,9 +45,19 @@ const rateLimit = new Promise((resolve, reject) => {
     })
 })
 
+const caching = new Promise((resolve, reject) => {
+    fastify.register(fastifyCaching, {
+        privacy: fastifyCaching.privacy.PRIVATE,
+        expiresIn: 60 * 60 * 1000 // 1 hour
+    }).then(() => {
+        resolve(true);
+    })
+})
+
 fastifyPlugins.push(corsPlugin);
 fastifyPlugins.push(formBody);
 fastifyPlugins.push(rateLimit);
+fastifyPlugins.push(caching);
 
 fastify.get("/", async(req, res) => {
     res.type("application/json").code(200);

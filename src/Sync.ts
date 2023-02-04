@@ -590,7 +590,6 @@ export default class Sync extends API {
                     });
                     if (result) {
                         results.push(result);
-                        this.db.insert([result], type);
                     }
                 }
                 if (config.debug) {
@@ -603,6 +602,54 @@ export default class Sync extends API {
 
         if (config.debug) {
             console.log(colors.green("Crawling finished."));
+        }
+        return results;
+    }
+
+    public async getRecentEpisodes(): Promise<FormattedResponse[]> {
+        let results = [];
+        const gogo = new GogoAnime();
+        const anime = await gogo.fetchRecentEpisodes();
+        for (let i = 0; i < anime.length; i++) {
+            const gogoTitle = this.sanitizeTitle(anime[i].title);
+            const possible = await this.aniList.search(gogoTitle, Type.ANIME);
+            if (possible.length > 0) {
+                let best: any = null;
+
+                possible.map(async (result:any) => {
+                    const title = result.title.userPreferred;
+                    const altTitles:any[] = Object.values(result.title).concat(result.synonyms);
+                    const aniList = result;
+    
+                    const sim = this.similarity(title, gogoTitle, altTitles);
+                    const tempBest = {
+                        index: i,
+                        similarity: sim,
+                        aniList: aniList,
+                    };
+    
+                    if (!best || sim.value > best.similarity.value) {
+                        best = tempBest;
+                    }
+                });
+                if (best) {
+                    const retEl = anime[best.index];
+                    results.push({
+                        id: retEl.url,
+                        data: best.aniList,
+                        similarity: best.similarity,
+                    });
+                }
+            }
+        }
+        const temp = this.formatSearch(results);
+        results = [];
+        for (let i = 0; i < temp.length; i++) {
+            const id = temp[i].id;
+            const data = await this.get(id);
+            if (data) {
+                results.push(data);
+            }
         }
         return results;
     }
