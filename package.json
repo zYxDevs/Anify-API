@@ -13,6 +13,7 @@
         "clean": "tsc --build --clean",
         "crawl:manga": "node ./scripts/crawl_manga.js",
         "crawl:anime": "node ./scripts/crawl_anime.js",
+        "init": "node ./scripts/init.js",
         "start": "node ./built/server.js"
     },
     "repository": {
