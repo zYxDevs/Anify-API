@@ -3,10 +3,10 @@
         "@types/node": "^18.11.13",
         "typescript": "^4.9.4"
     },
-    "name": "anify-api",
-    "description": "Anify API.",
-    "version": "2.0.0",
-    "main": "./built/Sync.js",
+    "name": "anify.js",
+    "description": "Advanced web scraper for Japanese media.",
+    "version": "2.0.1",
+    "main": "./built/Anify.js",
     "scripts": {
         "test": "node ./test.js",
         "build": "tsc --build",

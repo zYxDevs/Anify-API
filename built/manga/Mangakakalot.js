@@ -1,21 +1,19 @@
-import { load } from "cheerio";
-import { ProviderType } from "../API";
-import Provider, { Chapter, Page } from "../Provider";
-import { Result } from "../Anify";
-import * as config from "../config.json";
-
-export default class Mangakakalot extends Provider {
-    private types = {
-        CHAPMAGNANATO: "https://chapmanganato.com",
-        READMANGANATO: "https://readmanganato.com",
-        MANGAKAKALOT: this.baseURL
-    };
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const cheerio_1 = require("cheerio");
+const API_1 = require("../API");
+const Provider_1 = require("../Provider");
+const config = require("../config.json");
+class Mangakakalot extends Provider_1.default {
     constructor() {
-        super("https://mangakakalot.com", ProviderType.MANGA);
+        super("https://mangakakalot.com", API_1.ProviderType.MANGA);
+        this.types = {
+            CHAPMAGNANATO: "https://chapmanganato.com",
+            READMANGANATO: "https://readmanganato.com",
+            MANGAKAKALOT: this.baseURL
+        };
     }
-
-    public async search(query:string): Promise<Array<Result>> {
+    async search(query) {
         const data = await this.fetch(`${this.baseURL}/home_json_search`, {
             method: "POST",
             headers: {
@@ -25,7 +23,7 @@ export default class Mangakakalot extends Provider {
         });
         const json = data.json();
         if (json.length > 0) {
-            const results = json.map((result:SearchResult) => {
+            const results = json.map((result) => {
                 const uri = new URL(result.story_link);
                 return {
                     url: uri.href,
@@ -35,23 +33,20 @@ export default class Mangakakalot extends Provider {
                 };
             });
             return results;
-        } else {
+        }
+        else {
             return [];
         }
     }
-
-    public async getChapters(id: string): Promise<Array<Chapter>> {
+    async getChapters(id) {
         const type = this.parseType(id);
         if (type === this.types.CHAPMAGNANATO || type === this.types.READMANGANATO) {
             const chapters = await this.fetch(`https://${id}`, {
                 maxRedirects: 5
             });
-            const $ = load(chapters.text());
-
+            const $ = (0, cheerio_1.load)(chapters.text());
             const results = [];
-
             const host = new URL(chapters.url).host;
-
             $("ul.row-content-chapter li.a-h").map((index, element) => {
                 const url = $(element).find("a.chapter-name").attr("href");
                 const title = $(element).find("a.chapter-name").attr("title");
@@ -59,19 +54,17 @@ export default class Mangakakalot extends Provider {
                     id: url.split(host)[1],
                     url: url,
                     title: title
-                })
-            })
+                });
+            });
             return results;
-        } else {
+        }
+        else {
             const chapters = await this.fetch(`https://${id}`, {
                 maxRedirects: 5
             });
-            const $ = load(chapters.text());
-
+            const $ = (0, cheerio_1.load)(chapters.text());
             const results = [];
-
             const host = new URL(chapters.url).host;
-
             $("div.chapter-list div.row").map((index, element) => {
                 const url = $(element).find("span a").attr("href");
                 const title = $(element).find("span a").attr("title");
@@ -79,29 +72,25 @@ export default class Mangakakalot extends Provider {
                     id: url.split("https://")[1],
                     url: url,
                     title: title
-                })
-            })
+                });
+            });
             return results;
         }
     }
-
-    public async getPages(id:string): Promise<Array<Page>> {
+    async getPages(id) {
         const result = [];
-        
         const dom = await this.fetch(`https://${id}`);
-
-        const $ = load(dom.text());
+        const $ = (0, cheerio_1.load)(dom.text());
         $("div.container-chapter-reader img").map((index, element) => {
             result.push({
                 url: `${config.web_server.url}/proxy?url=${this.encrypt($(element).attr("src"))}&referer=${this.encrypt("https://" + id)}`,
                 index: index
-            })
-        })
+            });
+        });
         return result;
     }
-
     // Change alias function from Mangakakalot
-    private parseQuery(query:string):string {
+    parseQuery(query) {
         let str = query ? query : "";
         str = str.toLowerCase();
         str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
@@ -116,23 +105,13 @@ export default class Mangakakalot extends Provider {
         str = str.replace(/^\_+|\_+$/g, "");
         return str;
     }
-
-    private parseTitle(name:string) {
+    parseTitle(name) {
         return name.replace("<span class=\"search_result_title_red\">", "").replace("</span>", "");
     }
-
-    private parseType(id:string) {
+    parseType(id) {
         const type = id.includes("manganato.com") ? id.includes("chapmanganato") ? this.types.CHAPMAGNANATO : this.types.READMANGANATO : this.types.MANGAKAKALOT;
         return type;
     }
 }
-
-interface SearchResult {
-    id: string;
-    name: string;
-    nameunsigned: string;
-    lastchapter: string;
-    image: string;
-    author: string;
-    story_link: string;
-}
+exports.default = Mangakakalot;
+//# sourceMappingURL=Mangakakalot.js.map
