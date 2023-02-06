@@ -52,10 +52,6 @@ You also need [Prisma](https://npmjs.com/package/prisma) and [@prisma/client](ht
 ├── package.json
 └── other_files_here
 ```
-Then, run the following command:
-```bash
-npx prisma generate
-```
 Finally, you will need to create a file called `.env` in your project folder. Put `DATABASE_URL="postgresql://postgres:password@localhost:3306"` in the file. You can change the database URL to whatever you want, but make sure to change the `database_url` in the options path to match the URL in the `.env` file.
 ```bash
 # .env
@@ -76,6 +72,22 @@ brew services start postgresql
 
 # Stop the server
 brew services stop postgresql
+```
+
+Then, run the following commands:
+```bash
+# Generate the Prisma client
+npx prisma generate
+
+# Migrates the database
+npx prisma migrate dev
+
+# Push the Prisma schema to the database
+npx prisma db push
+
+# You can also use yarn
+yarn prisma db migrate dev
+yarn prisma db push
 ```
 If you don't have MacOS, you can download PostgreSQL and follow the tutorial on their website. If you want to use a GUI, you can use other tools like [Postico](https://eggerapps.at/postico/).
 
