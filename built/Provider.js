@@ -46,6 +46,18 @@ class Provider extends API_1.default {
         this.baseURL = baseURL;
         this.providerType = type;
     }
+    async getEpisodes(id) {
+        throw new Error("Not implemented yet.");
+    }
+    async getChapters(id) {
+        throw new Error("Not implemented yet.");
+    }
+    async getSources(id) {
+        throw new Error("Not implemented yet.");
+    }
+    async getPages(id) {
+        throw new Error("Not implemented yet.");
+    }
     urlToId(url) {
         return url.split(this.baseURL)[1];
     }

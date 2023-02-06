@@ -13,20 +13,20 @@ const MangaDex_1 = require("./manga/MangaDex");
 const Mangakakalot_1 = require("./manga/Mangakakalot");
 const MangaPark_1 = require("./manga/MangaPark");
 const MangaSee_1 = require("./manga/MangaSee");
-const DB_1 = require("./DB");
-const config = require("./config.json");
+const DB_1 = require("./db/DB");
 const colors = require("colors");
 const AnimeThemes_1 = require("./meta/AnimeThemes");
 const TMDB_1 = require("./meta/TMDB");
 const KitsuAnime_1 = require("./meta/KitsuAnime");
 const KitsuManga_1 = require("./meta/KitsuManga");
-const LiveChart_1 = require("./meta/LiveChart");
+const dotenv = require("dotenv");
 class Sync extends API_1.default {
     constructor() {
         super(API_1.ProviderType.NONE);
         this.aniList = new AniList_1.default();
         this.db = new DB_1.default();
         this.classDictionary = [];
+        dotenv.config();
         // Class dictionary of all providers. Used for looping through and searching.
         this.classDictionary = [
             // Zoro has CloudFlare sometimes
@@ -86,10 +86,11 @@ class Sync extends API_1.default {
                 name: "KitsuManga",
                 object: new KitsuManga_1.default(),
             },
-            {
-                name: "LiveChart",
-                object: new LiveChart_1.default(),
-            }
+            // Really high rate limit
+            //{
+            //name: "LiveChart",
+            //object: new LiveChart(),
+            //}
         ];
     }
     async init() {
@@ -106,19 +107,19 @@ class Sync extends API_1.default {
         // Searches first on the database for a result
         const possible = await this.db.search(query, type);
         if (!possible || possible.length === 0) {
-            if (config.debug) {
+            if (this.config.debug) {
                 console.log(colors.yellow("No results found in database. Searching providers..."));
                 console.log(colors.gray("Searching for ") + colors.blue(query) + colors.gray(" of type ") + colors.blue(type) + colors.gray("..."));
             }
             // Search on AniList first
             const aniSearch = await this.aniSearch(query, type);
-            if (config.debug) {
+            if (this.config.debug) {
                 console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
             }
             const aniList = this.searchCompare(result, aniSearch);
             // Then search on providers
             const pageSearch = await this.pageSearch(query, type);
-            if (config.debug) {
+            if (this.config.debug) {
                 console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
             }
             // Find the best results possible
@@ -356,7 +357,7 @@ class Sync extends API_1.default {
         if (possible != null) {
             const curTime = new Date(Date.now()).getTime();
             const diff = curTime - possible.lastCached;
-            if (diff < config.cache_timeout && possible.data.length > 0) {
+            if (diff < this.config.cache_timeout && possible.data.length > 0) {
                 episodes.push(...possible.data);
                 return episodes;
             }
@@ -406,7 +407,7 @@ class Sync extends API_1.default {
         if (possible != null) {
             const curTime = new Date(Date.now()).getTime();
             const diff = curTime - possible.lastCached;
-            if (diff < config.cache_timeout && possible.data.length > 0) {
+            if (diff < this.config.cache_timeout && possible.data.length > 0) {
                 chapters.push(...possible.data);
                 return chapters;
             }
@@ -464,7 +465,7 @@ class Sync extends API_1.default {
                     return sources;
                 }
                 else {
-                    if (diff < config.cache_timeout) {
+                    if (diff < this.config.cache_timeout) {
                         sources = possible.data;
                         return sources;
                     }
@@ -496,7 +497,7 @@ class Sync extends API_1.default {
             const curTime = new Date(Date.now()).getTime();
             const diff = curTime - possible.lastCached;
             if (possible.data != null) {
-                if (diff < config.cache_timeout) {
+                if (diff < this.config.cache_timeout) {
                     sources = possible.data;
                     return sources;
                 }
@@ -573,14 +574,14 @@ class Sync extends API_1.default {
             if (!possible) {
                 const start = new Date(Date.now());
                 const data = await this.aniList.getMedia(ids[i]).catch((err) => {
-                    if (config.debug) {
+                    if (this.config.debug) {
                         console.log(colors.red("Error fetching ID: ") + colors.white(ids[i] + ""));
                     }
                     return null;
                 });
                 if (data) {
                     const result = await this.get(ids[i]).catch((err) => {
-                        if (config.debug) {
+                        if (this.config.debug) {
                             console.log(colors.red("Error fetching ID from providers: ") + colors.white(ids[i] + ""));
                             console.log(colors.gray(err.message));
                         }
@@ -590,14 +591,14 @@ class Sync extends API_1.default {
                         results.push(result);
                     }
                 }
-                if (config.debug) {
+                if (this.config.debug) {
                     const end = new Date(Date.now());
                     console.log(colors.gray("Finished fetching data. Request(s) took ") + colors.cyan(String(end.getTime() - start.getTime())) + colors.gray(" milliseconds."));
                     console.log(colors.green("Fetched ID ") + colors.blue("#" + (i + 1) + "/" + maxIds));
                 }
             }
         }
-        if (config.debug) {
+        if (this.config.debug) {
             console.log(colors.green("Crawling finished."));
         }
         return results;

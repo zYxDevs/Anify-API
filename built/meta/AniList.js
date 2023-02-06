@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Status = exports.Genres = exports.Sort = exports.Format = exports.Type = exports.getMangaIDs = exports.getAnimeIDs = exports.getMedia = exports.search = void 0;
 const API_1 = require("../API");
 const Provider_1 = require("../Provider");
-const config = require("../config.json");
 class AniList extends Provider_1.default {
     constructor() {
         super("https://anilist.co", API_1.ProviderType.META);
@@ -285,10 +284,10 @@ class AniList extends Provider_1.default {
             `,
             variables: {
                 "type": type,
-                "season": config.AniList.SEASON,
-                "seasonYear": config.AniList.SEASON_YEAR,
-                "nextSeason": config.AniList.NEXT_SEASON,
-                "nextYear": config.AniList.NEXT_YEAR
+                "season": this.config.AniList.SEASON,
+                "seasonYear": this.config.AniList.SEASON_YEAR,
+                "nextSeason": this.config.AniList.NEXT_SEASON,
+                "nextYear": this.config.AniList.NEXT_YEAR
             }
         };
         try {
@@ -355,9 +354,9 @@ class AniList extends Provider_1.default {
             },
             json: {
                 'grant_type': 'authorization_code',
-                'client_id': config.AniList.oath_id,
-                'client_secret': config.AniList.oath_secret,
-                'redirect_uri': config.web_server.url + "/auth",
+                'client_id': this.config.AniList.oath_id,
+                'client_secret': this.config.AniList.oath_secret,
+                'redirect_uri': this.config.web_server.url + "/auth",
                 'code': code,
             }
         };

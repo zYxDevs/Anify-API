@@ -11,8 +11,7 @@ import MangaDex from "./manga/MangaDex";
 import Mangakakalot from "./manga/Mangakakalot";
 import MangaPark from "./manga/MangaPark";
 import MangaSee from "./manga/MangaSee";
-import DB from "./DB";
-import * as config from "./config.json";
+import DB from "./db/DB";
 import * as colors from "colors";
 import { Episode, Page, SubbedSource } from "./Provider";
 import AnimeThemes from "./meta/AnimeThemes";
@@ -20,6 +19,7 @@ import TMDB from "./meta/TMDB";
 import KitsuAnime from "./meta/KitsuAnime";
 import KitsuManga from "./meta/KitsuManga";
 import LiveChart from "./meta/LiveChart";
+import * as dotenv from "dotenv";
 
 export default class Sync extends API {
     public aniList = new AniList();
@@ -30,6 +30,8 @@ export default class Sync extends API {
 
     constructor() {
         super(ProviderType.NONE);
+
+        dotenv.config();
 
         // Class dictionary of all providers. Used for looping through and searching.
         this.classDictionary = [
@@ -90,10 +92,11 @@ export default class Sync extends API {
                 name: "KitsuManga",
                 object: new KitsuManga(),
             },
-            {
-                name: "LiveChart",
-                object: new LiveChart(),
-            }
+            // Really high rate limit
+            //{
+                //name: "LiveChart",
+                //object: new LiveChart(),
+            //}
         ]
     }
 
@@ -112,19 +115,19 @@ export default class Sync extends API {
         // Searches first on the database for a result
         const possible = await this.db.search(query, type);
         if (!possible || possible.length === 0) {
-            if (config.debug) {
+            if (this.config.debug) {
                 console.log(colors.yellow("No results found in database. Searching providers..."));
                 console.log(colors.gray("Searching for ") + colors.blue(query) + colors.gray(" of type ") + colors.blue(type) + colors.gray("..."));
             }
             // Search on AniList first
             const aniSearch = await this.aniSearch(query, type);
-            if (config.debug) {
+            if (this.config.debug) {
                 console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
             }
             const aniList = this.searchCompare(result, aniSearch);
             // Then search on providers
             const pageSearch = await this.pageSearch(query, type);
-            if (config.debug) {
+            if (this.config.debug) {
                 console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
             }
             // Find the best results possible
@@ -377,7 +380,7 @@ export default class Sync extends API {
         if (possible != null) {
             const curTime = new Date(Date.now()).getTime();
             const diff = curTime - possible.lastCached;
-            if (diff < config.cache_timeout && possible.data.length > 0) {
+            if (diff < this.config.cache_timeout && possible.data.length > 0) {
                 episodes.push(...possible.data);
                 return episodes;
             }
@@ -430,7 +433,7 @@ export default class Sync extends API {
         if (possible != null) {
             const curTime = new Date(Date.now()).getTime();
             const diff = curTime - possible.lastCached;
-            if (diff < config.cache_timeout && possible.data.length > 0) {
+            if (diff < this.config.cache_timeout && possible.data.length > 0) {
                 chapters.push(...possible.data);
                 return chapters;
             }
@@ -491,7 +494,7 @@ export default class Sync extends API {
                     sources = possible.data;
                     return sources;
                 } else {
-                    if (diff < config.cache_timeout) {
+                    if (diff < this.config.cache_timeout) {
                         sources = possible.data;
                         return sources;
                     }
@@ -526,7 +529,7 @@ export default class Sync extends API {
             const curTime = new Date(Date.now()).getTime();
             const diff = curTime - possible.lastCached;
             if (possible.data != null) {
-                if (diff < config.cache_timeout) {
+                if (diff < this.config.cache_timeout) {
                     sources = possible.data;
                     return sources;
                 }
@@ -608,14 +611,14 @@ export default class Sync extends API {
                 const start = new Date(Date.now());
 
                 const data = await this.aniList.getMedia(ids[i]).catch((err) => {
-                    if (config.debug) {
+                    if (this.config.debug) {
                         console.log(colors.red("Error fetching ID: ") + colors.white(ids[i] + ""));
                     }
                     return null;
                 });
                 if (data) {
                     const result = await this.get(ids[i]).catch((err) => {
-                        if (config.debug) {
+                        if (this.config.debug) {
                             console.log(colors.red("Error fetching ID from providers: ") + colors.white(ids[i] + ""));
                             console.log(colors.gray(err.message));
                         }
@@ -625,7 +628,7 @@ export default class Sync extends API {
                         results.push(result);
                     }
                 }
-                if (config.debug) {
+                if (this.config.debug) {
                     const end = new Date(Date.now());
                     console.log(colors.gray("Finished fetching data. Request(s) took ") + colors.cyan(String(end.getTime() - start.getTime())) + colors.gray(" milliseconds."));
                     console.log(colors.green("Fetched ID ") + colors.blue("#" + (i + 1) + "/" + maxIds));
@@ -633,7 +636,7 @@ export default class Sync extends API {
             }
         }
 
-        if (config.debug) {
+        if (this.config.debug) {
             console.log(colors.green("Crawling finished."));
         }
         return results;

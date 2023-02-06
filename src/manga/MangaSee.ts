@@ -2,7 +2,6 @@ import { load } from "cheerio";
 import { ProviderType } from "../API";
 import Provider, { Chapter, Page } from "../Provider";
 import { Result } from "../Anify";
-import * as config from "../config.json";
 
 export default class MangaSee extends Provider {
     constructor() {
@@ -73,7 +72,7 @@ export default class MangaSee extends Provider {
                 const imagePath = `https://${imageHost}/manga/${mangaId}/${chapter}-${page}.png`;
         
                 images.push({
-                    url: `${config.web_server.url}/proxy?url=${this.encrypt(imagePath)}&referer=${this.encrypt(this.baseURL)}`,
+                    url: `${this.config.web_server.url}/proxy?url=${this.encrypt(imagePath)}&referer=${this.encrypt(this.baseURL)}`,
                     index: i
                 });
             }

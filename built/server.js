@@ -5,7 +5,6 @@ const cors_1 = require("@fastify/cors");
 const formbody_1 = require("@fastify/formbody");
 const rate_limit_1 = require("@fastify/rate-limit");
 const caching_1 = require("@fastify/caching");
-const config = require("./config.json");
 const Anify_1 = require("./Anify");
 const Novels_1 = require("./novels/Novels");
 const AniList_1 = require("./meta/AniList");
@@ -18,7 +17,7 @@ const fastify = (0, fastify_1.default)({
 const fastifyPlugins = [];
 const corsPlugin = new Promise((resolve, reject) => {
     fastify.register(cors_1.default, {
-        origin: config.web_server.cors,
+        origin: aniSync.config.web_server.cors,
         methods: ['POST', 'GET', 'PATCH', 'DELETE', 'OPTIONS'],
     }).then(() => {
         resolve(true);
@@ -68,12 +67,12 @@ fastify.get("/stats", async (req, res) => {
     };
 });
 fastify.get("/login", async (req, res) => {
-    res.redirect(303, `https://anilist.co/api/v2/oauth/authorize?client_id=${config.AniList.oath_id}&redirect_uri=${config.web_server.url + "/auth"}&response_type=code`);
+    res.redirect(303, `https://anilist.co/api/v2/oauth/authorize?client_id=${aniSync.config.AniList.oath_id}&redirect_uri=${aniSync.config.web_server.url + "/auth"}&response_type=code`);
 });
 fastify.get("/auth", async (req, res) => {
     const code = req.query["code"];
     const token = await aniList.auth(code);
-    res.redirect(303, `${config.web_server.main_url}/auth?token=${token.access_token}`);
+    res.redirect(303, `${aniSync.config.web_server.main_url}/auth?token=${token.access_token}`);
 });
 fastify.post("/viewer", async (req, res) => {
     const token = req.body["token"];
@@ -545,7 +544,7 @@ fastify.get("/proxy", async (req, res) => {
     res.send(await aniSync.getImage(url, { headers: { referer } }));
 });
 Promise.all(fastifyPlugins).then(() => {
-    fastify.listen({ port: config.web_server.port }, (err, address) => {
+    fastify.listen({ port: aniSync.config.web_server.port }, (err, address) => {
         if (err)
             throw err;
         console.log(`Listening to ${address}.`);

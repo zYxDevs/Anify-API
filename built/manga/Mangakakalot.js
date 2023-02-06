@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cheerio_1 = require("cheerio");
 const API_1 = require("../API");
 const Provider_1 = require("../Provider");
-const config = require("../config.json");
 class Mangakakalot extends Provider_1.default {
     constructor() {
         super("https://mangakakalot.com", API_1.ProviderType.MANGA);
@@ -83,7 +82,7 @@ class Mangakakalot extends Provider_1.default {
         const $ = (0, cheerio_1.load)(dom.text());
         $("div.container-chapter-reader img").map((index, element) => {
             result.push({
-                url: `${config.web_server.url}/proxy?url=${this.encrypt($(element).attr("src"))}&referer=${this.encrypt("https://" + id)}`,
+                url: `${this.config.web_server.url}/proxy?url=${this.encrypt($(element).attr("src"))}&referer=${this.encrypt("https://" + id)}`,
                 index: index
             });
         });

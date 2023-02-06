@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cheerio_1 = require("cheerio");
 const API_1 = require("../API");
 const Provider_1 = require("../Provider");
-const config = require("../config.json");
 class MangaSee extends Provider_1.default {
     constructor() {
         super("https://mangasee123.com", API_1.ProviderType.MANGA);
@@ -83,7 +82,7 @@ class MangaSee extends Provider_1.default {
                 const mangaId = id.split('-chapter-', 1)[0].split("/read-online/")[1];
                 const imagePath = `https://${imageHost}/manga/${mangaId}/${chapter}-${page}.png`;
                 images.push({
-                    url: `${config.web_server.url}/proxy?url=${this.encrypt(imagePath)}&referer=${this.encrypt(this.baseURL)}`,
+                    url: `${this.config.web_server.url}/proxy?url=${this.encrypt(imagePath)}&referer=${this.encrypt(this.baseURL)}`,
                     index: i
                 });
             }

@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const API_1 = require("../API");
 const Provider_1 = require("../Provider");
-const config = require("../config.json");
 class MangaDex extends Provider_1.default {
     constructor() {
         super("https://mangadex.org", API_1.ProviderType.MANGA);
@@ -130,7 +129,7 @@ class MangaDex extends Provider_1.default {
         for (let i = 0; i < data.chapter.data.length; i++) {
             const url = `${baseUrl}/data/${hash}/${data.chapter.data[i]}`;
             pages.push({
-                url: `${config.web_server.url}/proxy?url=${this.encrypt(url)}&referer=${this.encrypt(this.baseURL)}`,
+                url: `${this.config.web_server.url}/proxy?url=${this.encrypt(url)}&referer=${this.encrypt(this.baseURL)}`,
                 index: i
             });
         }

@@ -1,6 +1,32 @@
 # Anify-API
 JavaScript API server for scraping anime and manga sites.
 
+## Installation
+Anify-API requires [PostgreSQL](https://www.postgresql.org/) and [Node.js](https://nodejs.org/en/) to run. On MacOS, you can install PostgreSQL via [Homebrew](https://brew.sh/):
+```bash
+brew install postgresql
+```
+Then, install the dependencies and start the server:
+```bash
+npm i
+brew services start postgresql
+```
+To stop the server, run:
+```bash
+brew services stop postgresql
+```
+
+## Configuration
+Anify-API uses [dotenv](https://www.npmjs.com/package/dotenv) to load environment variables. You can create a `.env` file in the root directory of the project and configure the database URL to setup PostgreSQL.
+```bash
+# .env
+# The URL is formatted as postgres://{username}:{password}@{host}:{port}/{database_name}
+DATABASE_URL="postgres://username:password@localhost:5432/anify"
+
+# Here is an example that I use
+DATABASE_URL="postgresql://postgres:password@localhost:3306"
+```
+
 ## Scraping
 Anify API scrapes numerous anime and manga sites, from Zoro, to GogoAnime, to AnimePahe, and more. The API is built on top of [AniSync](https://github.com/Eltik/AniSync) to map AniList information to streaming sites, allowing for multiple providers in case one ever goes down. To avoid rate limits, the API also caches data for a set amount of time and retrieves it when necessary.
 ## Anime

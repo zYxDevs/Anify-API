@@ -12,6 +12,22 @@ export default class Provider extends API {
         this.providerType = type;
     }
 
+    public async getEpisodes(id:string): Promise<Array<Episode>> {
+        throw new Error("Not implemented yet.");      
+    }
+
+    public async getChapters(id:string): Promise<Array<Chapter>> {
+        throw new Error("Not implemented yet.");      
+    }
+
+    public async getSources(id:string): Promise<SubbedSource> {
+        throw new Error("Not implemented yet.");      
+    }
+
+    public async getPages(id:string): Promise<Array<Page>> {
+        throw new Error("Not implemented yet.");      
+    }
+
     public urlToId(url:string): string {
         return url.split(this.baseURL)[1];
     }

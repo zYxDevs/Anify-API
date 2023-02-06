@@ -1,13 +1,10 @@
 import { join } from "path";
-import { Database } from "sqlite3";
 import API, { ProviderType } from "../API";
 import { Poppler } from "node-poppler";
+import { prisma } from "../db/client";
 import { createReadStream, existsSync, lstatSync, readdirSync, readFileSync, ReadStream, rename, unlink } from "fs";
-import * as config from "../config.json";
 
 export default class Novels extends API {
-    private db = new Database(config.database_path);
-
     constructor() {
         super(ProviderType.NOVEL);
     }
@@ -30,114 +27,103 @@ export default class Novels extends API {
     }
 
     public async getAllNovelsFromSQL(): Promise<Array<NovelInfo>> {
-        return new Promise((resolve, reject) => {
-            const db = this.db;
-            db.serialize(function () {
-                db.all('SELECT * FROM novels', function (err, rows, fields) {
-                    if (err) console.error(err);
-                    if (rows != undefined) {
-                        resolve(rows);
-                    } else {
-                        resolve(undefined);
-                    }
-                });
-            });
-        });
+        return prisma.novels.findMany() as any;
     }
 
     public async insert(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const db = this.db;
+        return new Promise(async(resolve, reject) => {
             const instance = this;
-
-            db.on("error", (error) => {
-                console.log(error);
-            })
             
             console.log("Serializing database...");
             try {
-                db.serialize(async function() {
-                    console.log("Serialized database.");
-                    console.log("Reading directory...");
-                    const folders = readdirSync(join(config.storage, "/Novels"));
-                    const promises = [];
-                    
-                    for (const folder of folders) {
-                        if (lstatSync(join(config.storage, `/Novels/${folder}`)).isDirectory()) {
-                            const stats = readdirSync(join(config.storage, `/Novels/${folder}`));
-    
-                            stats.filter(stat => stat.endsWith(".pdf")).forEach(file => {
-                                console.log("Reading " + file + ".");
-                                const promise = new Promise(async(resolve, reject) => {
-                                    const folderName = folder;
-                                    let path = folderName + "/" + file;
-                                    if (!existsSync(join(config.storage, `/Novels/${path}`))) {
-                                        console.log("Issue with path: " + join(config.storage, `/Novels/${path}`));
-                                    } else {
-                                        const coverName = file.split(" [")[0] ? file.split(" [")[0] : file;
-                                        const id = instance.makeId(5);
-                                        path = path.endsWith(".pdf") ? path : path + ".pdf";
-                                        let cover = null;
-    
-                                        const name = coverName.replace(/[^\w .-]/gi, "");
-                                        resolve(true);
-    
-                                        db.get('SELECT * FROM novels WHERE path=?', [path], function (err, rows, fields) {
-                                            if (err) console.error(err);
-                                            if (!rows) {
-                                                console.log("Now inserting light novel " + name);
-                                                if (!existsSync(join(config.storage, `/Novels/${folderName}/${coverName}_thumbnail.png`))) {
-                                                    cover = "/5 Centimeters per Second + Children Who Chase Lost Voices/5 Centimeters per Second + Children Who Chase Lost Voices - Complete_thumbnail.png"
-                                                } else {
-                                                    cover = `${folderName}/${coverName}_thumbnail.png`;
-                                                }
+                console.log("Serialized database.");
+                console.log("Reading directory...");
+                const folders = readdirSync(join(this.config.storage, "/Novels"));
+                const promises = [];
+                
+                for (const folder of folders) {
+                    if (lstatSync(join(this.config.storage, `/Novels/${folder}`)).isDirectory()) {
+                        const stats = readdirSync(join(this.config.storage, `/Novels/${folder}`));
 
-                                                db.run('INSERT INTO novels (title, path, cover, id) VALUES (?, ?, ?, ?)', [name, path, cover, id], function (err) {
-                                                    if (err) console.error(err);
-                                                    console.log("Inserted " + name + "!");
-                                                    resolve(true);
-                                                });
-                                            } else {
-                                                console.log(name + " already eixsts in the database.");
-                                                resolve(true);
+                        stats.filter(stat => stat.endsWith(".pdf")).forEach(file => {
+                            console.log("Reading " + file + ".");
+                            const promise = new Promise(async(resolve, reject) => {
+                                const folderName = folder;
+                                let path = folderName + "/" + file;
+                                if (!existsSync(join(this.config.storage, `/Novels/${path}`))) {
+                                    console.log("Issue with path: " + join(this.config.storage, `/Novels/${path}`));
+                                } else {
+                                    const coverName = file.split(" [")[0] ? file.split(" [")[0] : file;
+                                    const id = instance.makeId(5);
+                                    path = path.endsWith(".pdf") ? path : path + ".pdf";
+                                    let cover = null;
+
+                                    const name = coverName.replace(/[^\w .-]/gi, "");
+                                    resolve(true);
+
+                                    const data = await prisma.novels.findFirst({
+                                        where: {
+                                            path: path
+                                        }
+                                    });
+                                    if (!data) {
+                                        console.log("Now inserting light novel " + name);
+                                        if (!existsSync(join(this.config.storage, `/Novels/${folderName}/${coverName}_thumbnail.png`))) {
+                                            cover = "/5 Centimeters per Second + Children Who Chase Lost Voices/5 Centimeters per Second + Children Who Chase Lost Voices - Complete_thumbnail.png"
+                                        } else {
+                                            cover = `${folderName}/${coverName}_thumbnail.png`;
+                                        }
+
+                                        await prisma.novels.create({
+                                            data: {
+                                                title: name,
+                                                path: path,
+                                                cover: cover,
+                                                id: id
                                             }
-                                        });
+                                        })
+                                        resolve(true);
+                                    } else {
+                                        console.log(name + " already eixsts in the database.");
+                                        resolve(true);
                                     }
-                                })
-                                promises.push(promise);
-                            });
-                        }
+                                }
+                            })
+                            promises.push(promise);
+                        });
                     }
-                    await Promise.all(promises).catch(console.error)
-                })   
+                }
+                await Promise.all(promises).catch(console.error)
+                resolve(null);
             } catch (e) {
                 console.error(e);
+                reject(null);
             }
         })
     }
 
     public async createCovers(): Promise<void> {
-        const folders = readdirSync(join(config.storage, "/Novels"));
+        const folders = readdirSync(join(this.config.storage, "/Novels"));
         const promises = [];
 
         for (const folder of folders) {
-            if (lstatSync(join(config.storage, `/Novels/${folder}`)).isDirectory()) {
-                const stats = readdirSync(join(config.storage, `/Novels/${folder}`));
+            if (lstatSync(join(this.config.storage, `/Novels/${folder}`)).isDirectory()) {
+                const stats = readdirSync(join(this.config.storage, `/Novels/${folder}`));
                 const instance = this;
 
                 stats.filter(stat => stat.endsWith(".pdf")).forEach(file => {
                     const promise = new Promise(async(resolve, reject) => {
                         const folderName = folder;
                         const path = `/${folderName}/${file}`;
-                        if (!existsSync(join(config.storage, `/Novels/${path}`))) {
-                            console.log("Issue with path: " + join(config.storage, `/Novels/${path}`));
+                        if (!existsSync(join(this.config.storage, `/Novels/${path}`))) {
+                            console.log("Issue with path: " + join(this.config.storage, `/Novels/${path}`));
                         } else {
                             const name = file.split(" [")[0] ? file.split(" [")[0] : file;
                             const path = `/Novels/${folderName}/${file}`;
-                            const pathToSnapshot = join(config.storage, path);
+                            const pathToSnapshot = join(this.config.storage, path);
                             let cover = null;
                             // Creates thumbnails
-                            if (!existsSync(join(config.storage, `/Novels/${folderName}/${name}_thumbnail.png`))) {
+                            if (!existsSync(join(this.config.storage, `/Novels/${folderName}/${name}_thumbnail.png`))) {
                                 cover = await instance.getFirstPage(pathToSnapshot, `${folderName}/${name}_thumbnail.png`);
                                 console.log("Fetched cover for " + cover + ".");
                             } else {
@@ -206,8 +192,8 @@ export default class Novels extends API {
         return new Promise((resolve, reject) => {
             const file = pathToSnapshot;
             let poppler = null;
-            if (config.isMacOS) {
-                poppler = new Poppler(config.poppler_path);
+            if (this.config.isMacOS) {
+                poppler = new Poppler(this.config.poppler_path);
             } else {
                 poppler = new Poppler();
             }
@@ -218,23 +204,23 @@ export default class Novels extends API {
             };
             const outputFile = pathToSnapshot.split(".pdf")[0];
     
-            if (existsSync(join(config.storage, `/Novels/${newPath}`))) {
+            if (existsSync(join(this.config.storage, `/Novels/${newPath}`))) {
                 console.log("Cover already eixsts for " + `/Novels/${newPath}` + ".");
                 resolve(newPath);
             } else {
                 poppler.pdfToCairo(file, outputFile, options).then((res) => {
                     if (existsSync(outputFile + "-001.png")) {
-                        rename(outputFile + "-001.png", join(config.storage, `/Novels/${newPath}`), (err) => {
+                        rename(outputFile + "-001.png", join(this.config.storage, `/Novels/${newPath}`), (err) => {
                             if (err) throw err;
                             resolve(newPath);
                         });
                     } else if (existsSync(outputFile + "-01.png")) {
-                        rename(outputFile + "-01.png", join(config.storage, `/Novels/${newPath}`), (err) => {
+                        rename(outputFile + "-01.png", join(this.config.storage, `/Novels/${newPath}`), (err) => {
                             if (err) throw err;
                             resolve(newPath);
                         });
                     } else if (existsSync(outputFile + "-1.png")) {
-                        rename(outputFile + "-1.png", join(config.storage, `/Novels/${newPath}`), (err) => {
+                        rename(outputFile + "-1.png", join(this.config.storage, `/Novels/${newPath}`), (err) => {
                             if (err) throw err;
                             resolve(newPath);
                         });
@@ -254,7 +240,7 @@ export default class Novels extends API {
         if (route.startsWith("/")) {
             route = route.substring(1);
         }
-        const path = join(config.storage, `/Novels/${route}`);
+        const path = join(this.config.storage, `/Novels/${route}`);
         if (!existsSync(path)) {
             return null;
         }
@@ -269,27 +255,25 @@ export default class Novels extends API {
         if (route.startsWith("/")) {
             route = route.substring(1);
         }
-        return new Promise((resolve, reject) => {
-            const db = this.db;
-            
-            db.serialize(function() {
-                db.get('SELECT * FROM novels WHERE id= ?', [route], function (err, rows, fields) {
-                    if (err) throw err;
-                    if (rows == null) {
-                        resolve(null);
-                    } else {
-                        const path = join(config.storage, `/Novels/${rows.path}`);
-                        if (!existsSync(path)) {
-                            return null;
-                        }
-                        const stream = createReadStream(path);
-                        stream.on("error", () => {
-                            console.error("Could not read file.");
-                        })
-                        resolve(stream);
-                    }
-                });
-            });
+        return new Promise(async(resolve, reject) => {
+            const data = await prisma.novels.findFirst({
+                where: {
+                    id: route
+                }
+            })
+            if (!data) {
+                resolve(null);
+            } else {
+                const path = join(this.config.storage, `/Novels/${data.path}`);
+                if (!existsSync(path)) {
+                    return null;
+                }
+                const stream = createReadStream(path);
+                stream.on("error", () => {
+                    console.error("Could not read file.");
+                })
+                resolve(stream);
+            }
         });
     }
 }

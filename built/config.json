@@ -1,8 +1,6 @@
 {
     "debug": true,
     "cache_timeout": 14400000,
-    "database_path": "/Users/eltik/Documents/Coding/Anify-API/db.db",
-    "export_path": "/Users/eltik/Documents/Coding/Anify-API",
     "encryptionKey": "myheroacademia",
     "storage": "/Users/eltik/Documents/Anify-API/storage",
     "isMacOS": true,

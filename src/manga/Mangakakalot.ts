@@ -2,7 +2,6 @@ import { load } from "cheerio";
 import { ProviderType } from "../API";
 import Provider, { Chapter, Page } from "../Provider";
 import { Result } from "../Anify";
-import * as config from "../config.json";
 
 export default class Mangakakalot extends Provider {
     private types = {
@@ -93,7 +92,7 @@ export default class Mangakakalot extends Provider {
         const $ = load(dom.text());
         $("div.container-chapter-reader img").map((index, element) => {
             result.push({
-                url: `${config.web_server.url}/proxy?url=${this.encrypt($(element).attr("src"))}&referer=${this.encrypt("https://" + id)}`,
+                url: `${this.config.web_server.url}/proxy?url=${this.encrypt($(element).attr("src"))}&referer=${this.encrypt("https://" + id)}`,
                 index: index
             })
         })

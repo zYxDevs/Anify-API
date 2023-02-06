@@ -1,7 +1,6 @@
 import { ProviderType } from "../API";
 import Provider, { Chapter, Page } from "../Provider";
 import { Result } from "../Anify";
-import * as config from "../config.json";
 
 export default class MangaDex extends Provider {
     private api:string = "https://api.mangadex.org";
@@ -157,7 +156,7 @@ export default class MangaDex extends Provider {
         for (let i = 0; i < data.chapter.data.length; i++) {
             const url = `${baseUrl}/data/${hash}/${data.chapter.data[i]}`;
             pages.push({
-                url: `${config.web_server.url}/proxy?url=${this.encrypt(url)}&referer=${this.encrypt(this.baseURL)}`,
+                url: `${this.config.web_server.url}/proxy?url=${this.encrypt(url)}&referer=${this.encrypt(this.baseURL)}`,
                 index: i
             })
         }
