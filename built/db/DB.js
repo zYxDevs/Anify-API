@@ -11,6 +11,7 @@ class DB extends API_1.default {
         super(API_1.ProviderType.NONE);
     }
     async init() {
+        await client_1.prisma.$connect();
         return true;
     }
     async search(query, type) {

@@ -70,6 +70,8 @@ const Anify = require("anify.js").default;
 // database_name can be an optional value as shown below
 const anify = new Anify({ database_url: "postgresql://postgres:password@localhost:3306" });
 
+await anify.init(); // You need to call init() to initialize the database
+
 // It is recommended that you cd into /node_modules/anify.js and run npm run build.
 ```
 Please view [this](https://github.com/Eltik/Anify-API/issues/1) for more information. If you need help with development, join our [Discord](https://anify.tv/discord) and view the [#help](https://discord.com/channels/950964096600252507/1071533139631026287) channel.

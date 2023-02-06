@@ -13,6 +13,7 @@ export default class DB extends API {
     }
 
     public async init() {
+        await prisma.$connect();
         return true;
     }
 
