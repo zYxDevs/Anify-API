@@ -1,0 +1,603 @@
+{
+    "anime": [
+        {
+            "id": 136430,
+            "data": {
+                "id": 136430,
+                "tags": [
+                    {
+                        "id": 618,
+                        "name": "Vikings"
+                    },
+                    {
+                        "id": 311,
+                        "name": "Rehabilitation"
+                    },
+                    {
+                        "id": 247,
+                        "name": "Slavery"
+                    },
+                    {
+                        "id": 50,
+                        "name": "Seinen"
+                    },
+                    {
+                        "id": 82,
+                        "name": "Male Protagonist"
+                    },
+                    {
+                        "id": 85,
+                        "name": "Tragedy"
+                    },
+                    {
+                        "id": 109,
+                        "name": "Primarily Adult Cast"
+                    },
+                    {
+                        "id": 391,
+                        "name": "Philosophy"
+                    },
+                    {
+                        "id": 909,
+                        "name": "Agriculture"
+                    },
+                    {
+                        "id": 25,
+                        "name": "Historical"
+                    },
+                    {
+                        "id": 250,
+                        "name": "Rural"
+                    },
+                    {
+                        "id": 102,
+                        "name": "Coming of Age"
+                    },
+                    {
+                        "id": 111,
+                        "name": "War"
+                    },
+                    {
+                        "id": 198,
+                        "name": "Foreign"
+                    },
+                    {
+                        "id": 43,
+                        "name": "Swordplay"
+                    },
+                    {
+                        "id": 94,
+                        "name": "Gore"
+                    },
+                    {
+                        "id": 1045,
+                        "name": "Heterosexual"
+                    },
+                    {
+                        "id": 231,
+                        "name": "Wrestling"
+                    }
+                ],
+                "type": "ANIME",
+                "idMal": 49387,
+                "title": {
+                    "native": "ヴィンランド・サガ SEASON2",
+                    "romaji": "VINLAND SAGA SEASON 2",
+                    "english": "Vinland Saga Season 2",
+                    "userPreferred": "VINLAND SAGA SEASON 2"
+                },
+                "format": "TV",
+                "genres": [
+                    "Action",
+                    "Adventure",
+                    "Drama"
+                ],
+                "season": "WINTER",
+                "source": "MANGA",
+                "status": "RELEASING",
+                "endDate": {
+                    "day": null,
+                    "year": null,
+                    "month": null
+                },
+                "isAdult": false,
+                "studios": {
+                    "edges": [
+                        {
+                            "node": {
+                                "id": 6199,
+                                "name": "Twin Engine"
+                            },
+                            "isMain": false
+                        },
+                        {
+                            "node": {
+                                "id": 569,
+                                "name": "MAPPA"
+                            },
+                            "isMain": true
+                        },
+                        {
+                            "node": {
+                                "id": 53,
+                                "name": "Dentsu"
+                            },
+                            "isMain": false
+                        },
+                        {
+                            "node": {
+                                "id": 159,
+                                "name": "Kodansha"
+                            },
+                            "isMain": false
+                        }
+                    ]
+                },
+                "trailer": {
+                    "id": "6pX93dXfH9s",
+                    "site": "youtube"
+                },
+                "volumes": null,
+                "chapters": null,
+                "duration": 26,
+                "episodes": 24,
+                "synonyms": [],
+                "meanScore": 86,
+                "relations": {
+                    "edges": [
+                        {
+                            "id": 59719,
+                            "node": {
+                                "id": 30642,
+                                "type": "MANGA",
+                                "title": {
+                                    "userPreferred": "Vinland Saga"
+                                },
+                                "format": "MANGA",
+                                "status": "RELEASING",
+                                "coverImage": {
+                                    "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx30642-x6RpmbP5mU7q.jpg"
+                                },
+                                "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/manga/banner/30642-MeizzL2WDv6C.jpg"
+                            },
+                            "relationType": "SOURCE"
+                        },
+                        {
+                            "id": 59721,
+                            "node": {
+                                "id": 101348,
+                                "type": "ANIME",
+                                "title": {
+                                    "userPreferred": "VINLAND SAGA"
+                                },
+                                "format": "TV",
+                                "status": "FINISHED",
+                                "coverImage": {
+                                    "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-msJS8z91mG0P.jpg"
+                                },
+                                "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101348-pivKKffCAwAY.jpg"
+                            },
+                            "relationType": "PREQUEL"
+                        }
+                    ]
+                },
+                "startDate": {
+                    "day": 10,
+                    "year": 2023,
+                    "month": 1
+                },
+                "coverImage": {
+                    "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx136430-f8Iza5GEynRW.jpg",
+                    "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx136430-f8Iza5GEynRW.jpg"
+                },
+                "favourites": 1751,
+                "isLicensed": true,
+                "popularity": 86884,
+                "seasonYear": 2023,
+                "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/136430-ktoFZnyubhHg.jpg",
+                "description": "The second season of <i>Vinland Saga</i>. <br><br>\n\nWhen Thorfinn loses it all, he must find his new purpose for living in a strange new land.\n<br><br>\n(Source: Crunchyroll)",
+                "averageScore": 86,
+                "airingSchedule": {
+                    "edges": [
+                        {
+                            "node": {
+                                "episode": 1,
+                                "airingAt": 1673278200,
+                                "timeUntilAiring": -2428534
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 2,
+                                "airingAt": 1673883000,
+                                "timeUntilAiring": -1823734
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 3,
+                                "airingAt": 1674487800,
+                                "timeUntilAiring": -1218934
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 4,
+                                "airingAt": 1675092600,
+                                "timeUntilAiring": -614134
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 5,
+                                "airingAt": 1675697400,
+                                "timeUntilAiring": -9334
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 6,
+                                "airingAt": 1676302200,
+                                "timeUntilAiring": 595466
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 7,
+                                "airingAt": 1676907000,
+                                "timeUntilAiring": 1200266
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 8,
+                                "airingAt": 1677511800,
+                                "timeUntilAiring": 1805066
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 9,
+                                "airingAt": 1678116600,
+                                "timeUntilAiring": 2409866
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 10,
+                                "airingAt": 1678721400,
+                                "timeUntilAiring": 3014666
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 11,
+                                "airingAt": 1679326200,
+                                "timeUntilAiring": 3619466
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 12,
+                                "airingAt": 1679931000,
+                                "timeUntilAiring": 4224266
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 13,
+                                "airingAt": 1680535800,
+                                "timeUntilAiring": 4829066
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 14,
+                                "airingAt": 1681140600,
+                                "timeUntilAiring": 5433866
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 15,
+                                "airingAt": 1681745400,
+                                "timeUntilAiring": 6038666
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 16,
+                                "airingAt": 1682350200,
+                                "timeUntilAiring": 6643466
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 17,
+                                "airingAt": 1682955000,
+                                "timeUntilAiring": 7248266
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 18,
+                                "airingAt": 1683559800,
+                                "timeUntilAiring": 7853066
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 19,
+                                "airingAt": 1684164600,
+                                "timeUntilAiring": 8457866
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 20,
+                                "airingAt": 1684769400,
+                                "timeUntilAiring": 9062666
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 21,
+                                "airingAt": 1685374200,
+                                "timeUntilAiring": 9667466
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 22,
+                                "airingAt": 1685979000,
+                                "timeUntilAiring": 10272266
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 23,
+                                "airingAt": 1686583800,
+                                "timeUntilAiring": 10877066
+                            }
+                        },
+                        {
+                            "node": {
+                                "episode": 24,
+                                "airingAt": 1687188600,
+                                "timeUntilAiring": 11481866
+                            }
+                        }
+                    ]
+                },
+                "countryOfOrigin": "JP",
+                "characterPreview": {
+                    "edges": [
+                        {
+                            "id": 317106,
+                            "name": null,
+                            "node": {
+                                "id": 10138,
+                                "name": {
+                                    "userPreferred": "Thorfinn Karlsefni"
+                                },
+                                "image": {
+                                    "large": "https://s4.anilist.co/file/anilistcdn/character/large/b10138-euhx5HUY1dil.jpg"
+                                }
+                            },
+                            "role": "MAIN",
+                            "voiceActors": [
+                                {
+                                    "id": 118498,
+                                    "name": {
+                                        "userPreferred": "Yuuto Uemura"
+                                    },
+                                    "image": {
+                                        "large": "https://s4.anilist.co/file/anilistcdn/staff/large/n118498-6YvZZS0HM2qD.jpg"
+                                    },
+                                    "language": "Japanese"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 317127,
+                            "name": null,
+                            "node": {
+                                "id": 28030,
+                                "name": {
+                                    "userPreferred": "Einar"
+                                },
+                                "image": {
+                                    "large": "https://s4.anilist.co/file/anilistcdn/character/large/b28030-pDu2v2nFSeka.png"
+                                }
+                            },
+                            "role": "MAIN",
+                            "voiceActors": [
+                                {
+                                    "id": 119185,
+                                    "name": {
+                                        "userPreferred": "Shunsuke Takeuchi"
+                                    },
+                                    "image": {
+                                        "large": "https://s4.anilist.co/file/anilistcdn/staff/large/n119185-65kkxuTRxAgo.png"
+                                    },
+                                    "language": "Japanese"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 342680,
+                            "name": null,
+                            "node": {
+                                "id": 17438,
+                                "name": {
+                                    "userPreferred": "Canute Svenson"
+                                },
+                                "image": {
+                                    "large": "https://s4.anilist.co/file/anilistcdn/character/large/b17438-7fxiIAHd6Omj.jpg"
+                                }
+                            },
+                            "role": "SUPPORTING",
+                            "voiceActors": [
+                                {
+                                    "id": 95819,
+                                    "name": {
+                                        "userPreferred": "Kenshou Ono"
+                                    },
+                                    "image": {
+                                        "large": "https://s4.anilist.co/file/anilistcdn/staff/large/n95819-O4fosAY0a1Ml.jpg"
+                                    },
+                                    "language": "Japanese"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 373003,
+                            "name": null,
+                            "node": {
+                                "id": 17440,
+                                "name": {
+                                    "userPreferred": "Thorkell"
+                                },
+                                "image": {
+                                    "large": "https://s4.anilist.co/file/anilistcdn/character/large/b17440-XvYe5JY862ZT.png"
+                                }
+                            },
+                            "role": "SUPPORTING",
+                            "voiceActors": [
+                                {
+                                    "id": 95146,
+                                    "name": {
+                                        "userPreferred": "Akio Ootsuka"
+                                    },
+                                    "image": {
+                                        "large": "https://s4.anilist.co/file/anilistcdn/staff/large/n95146-T6IEmqXW3xUN.jpg"
+                                    },
+                                    "language": "Japanese"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 373002,
+                            "name": null,
+                            "node": {
+                                "id": 19486,
+                                "name": {
+                                    "userPreferred": "Leif Erikson"
+                                },
+                                "image": {
+                                    "large": "https://s4.anilist.co/file/anilistcdn/character/large/b19486-XRzBNqoLb5Le.png"
+                                }
+                            },
+                            "role": "SUPPORTING",
+                            "voiceActors": [
+                                {
+                                    "id": 95926,
+                                    "name": {
+                                        "userPreferred": "Youji Ueda"
+                                    },
+                                    "image": {
+                                        "large": "https://s4.anilist.co/file/anilistcdn/staff/large/n95926-IzwXTUF5tUJD.png"
+                                    },
+                                    "language": "Japanese"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 317128,
+                            "name": null,
+                            "node": {
+                                "id": 75590,
+                                "name": {
+                                    "userPreferred": "Arnheid"
+                                },
+                                "image": {
+                                    "large": "https://s4.anilist.co/file/anilistcdn/character/large/b75590-grddrcysIfPx.jpg"
+                                }
+                            },
+                            "role": "SUPPORTING",
+                            "voiceActors": [
+                                {
+                                    "id": 96673,
+                                    "name": {
+                                        "userPreferred": "Mayumi Sako"
+                                    },
+                                    "image": {
+                                        "large": "https://s4.anilist.co/file/anilistcdn/staff/large/1673.jpg"
+                                    },
+                                    "language": "Japanese"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "streamingEpisodes": []
+            },
+            "connectors": [
+                {
+                    "id": "https://zoro.to/vinland-saga-2nd-season-18239?ref=search",
+                    "similarity": {
+                        "same": true,
+                        "value": 0.8108108108108109
+                    }
+                },
+                {
+                    "id": "https://animefox.tv/anime/vinland-saga-season-2",
+                    "similarity": {
+                        "same": true,
+                        "value": 1
+                    }
+                },
+                {
+                    "id": "https://animefox.tv/anime/vinland-saga-season-2-dub",
+                    "similarity": {
+                        "same": true,
+                        "value": 1
+                    }
+                },
+                {
+                    "id": "https://animepahe.com/anime/6e661ebb-24b6-1731-9371-d9fbe6a52f3d",
+                    "similarity": {
+                        "same": true,
+                        "value": 1
+                    }
+                },
+                {
+                    "id": "https://api.enime.moe/anime/cl6og3ccv004xaclu70pdgp1i",
+                    "similarity": {
+                        "same": true,
+                        "value": 1
+                    }
+                },
+                {
+                    "id": "https://www1.gogoanime.bid/category/vinland-saga-season-2",
+                    "similarity": {
+                        "same": true,
+                        "value": 1
+                    }
+                },
+                {
+                    "id": "https://www1.gogoanime.bid/category/vinland-saga-season-2-dub",
+                    "similarity": {
+                        "same": true,
+                        "value": 1
+                    }
+                },
+                {
+                    "id": "https://animethemes.moe/anime/vinland_saga_season_2",
+                    "similarity": {
+                        "same": true,
+                        "value": 1
+                    }
+                },
+                {
+                    "id": "https://kitsu.io/api/edge/anime/44875",
+                    "similarity": {
+                        "same": true,
+                        "value": 1
+                    }
+                }
+            ]
+        }
+    ],
+    "manga": []
+}

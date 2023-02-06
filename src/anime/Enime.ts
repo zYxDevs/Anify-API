@@ -1,6 +1,6 @@
 import Provider, { Episode, SubbedSource } from "../Provider";
 import { ProviderType } from "../API";
-import { Result } from "../Anify";
+import { Result } from "../Core";
 
 export default class Enime extends Provider {
     private api = 'https://api.enime.moe';

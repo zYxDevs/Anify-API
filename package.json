@@ -17,6 +17,8 @@
         "db:generate": "npx prisma generate",
         "db:push": "npx prisma db push",
         "db:validate": "npx prisma validate",
+        "export": "node ./scripts/export.js",
+        "import": "node ./scripts/import.js",
         "clean": "tsc --build --clean",
         "crawl:manga": "node ./scripts/crawl_manga.js",
         "crawl:anime": "node ./scripts/crawl_anime.js",

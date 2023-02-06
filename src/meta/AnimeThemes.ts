@@ -2,7 +2,7 @@
 import { load } from "cheerio";
 import { ProviderType } from "../API";
 import Provider from "../Provider";
-import { Result } from "../Anify";
+import { Result } from "../Core";
 
 export default class AnimeThemes extends Provider {
     private graphql:string = "https://animethemes.moe/api/graphql";

@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 import Provider, { Episode, StreamingServers, SubbedSource } from "../Provider";
 import { ProviderType } from "../API";
-import { Result } from "../Anify";
+import { Result } from "../Core";
 
 export default class Zoro extends Provider {
     private api:string = `${this.baseURL}/ajax/v2`;

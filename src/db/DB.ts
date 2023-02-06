@@ -1,9 +1,11 @@
-import { Content, FormattedResponse } from "../Anify";
+import { Content, FormattedResponse } from "../Core";
 import { Type } from "../meta/AniList";
 import { prisma } from './client';
 import * as colors from "colors";
 import API, { ProviderType } from "../API";
 import { SubbedSource } from "../Provider";
+import { join } from "path";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 
 export default class DB extends API {
     constructor() {
@@ -241,12 +243,42 @@ export default class DB extends API {
         if (type === Type.ANIME) {
             return prisma.anime.findMany() as any;
         } else if (type === Type.MANGA) {
-            return prisma.anime.findMany() as any;
+            return prisma.manga.findMany() as any;
         }
     }
 
-    public async export(type:Type): Promise<void> {
-        return;
+    public async export(): Promise<void> {
+        const anime = await prisma.anime.findMany();
+        const manga = await prisma.manga.findMany();
+        const dateAsString = new Date(Date.now()).toISOString().replace(/:/g, "-");
+        const toExport = join(__dirname, "../../" + dateAsString + "-export.json");
+        const data = {
+            anime,
+            manga
+        };
+        writeFileSync(toExport, JSON.stringify(data, null, 4), "utf8");
+        console.log(colors.white("Exported database to ") + colors.blue(toExport) + colors.white("."));
+    }
+
+    public async import(): Promise<void> {
+        const exists = existsSync(join(__dirname, "../../export.json"));
+        if (!exists) {
+            console.log(colors.red("No export file found. Please make sure you have an export.json file in the root directory."));
+            return;
+        }
+        const file = readFileSync(join(__dirname, "../../export.json"), "utf8");
+        const data = JSON.parse(file);
+        const anime:FormattedResponse[] = data.anime;
+        const manga:FormattedResponse[] = data.manga;
+        if (!anime || !manga) {
+            console.log(colors.red("Invalid export file. Please make sure you have an export.json file in the root directory."));
+            return;
+        }
+        await this.insert(anime, Type.ANIME);
+        await this.insert(manga, Type.MANGA);
+        if (this.config.debug) {
+            console.log(colors.white("Imported database from ") + colors.blue("export.json") + colors.white("."));
+        }
     }
 }
 

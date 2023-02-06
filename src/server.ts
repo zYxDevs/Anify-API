@@ -4,12 +4,12 @@ import fastifyFormbody from "@fastify/formbody";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyCaching from "@fastify/caching";
 
-import Sync from "./Anify";
+import Core from "./Core";
 import Novels from "./novels/Novels";
 import { Type } from "./meta/AniList";
 import { SubbedSource } from "./Provider";
 
-const aniSync = new Sync();
+const aniSync = new Core();
 const aniList = aniSync.aniList;
 const novels = new Novels();
 

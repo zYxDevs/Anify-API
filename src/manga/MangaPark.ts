@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 import Provider, { Chapter, Page } from "../Provider";
 import { ProviderType } from "../API";
-import { Result } from "../Anify";
+import { Result } from "../Core";
 
 export default class MangaPark extends Provider {
     constructor() {

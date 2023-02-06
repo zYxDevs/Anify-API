@@ -1,6 +1,6 @@
 import { ProviderType } from "../API";
 import Provider, { Chapter, Page } from "../Provider";
-import { Result } from "../Anify";
+import { Result } from "../Core";
 
 export default class MangaDex extends Provider {
     private api:string = "https://api.mangadex.org";

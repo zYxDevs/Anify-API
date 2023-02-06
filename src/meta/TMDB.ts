@@ -1,6 +1,6 @@
 import { ProviderType } from "../API";
 import Provider from "../Provider";
-import { Result } from "../Anify";
+import { Result } from "../Core";
 
 export default class TMDB extends Provider {
     private apiUrl = 'https://api.themoviedb.org/3';
