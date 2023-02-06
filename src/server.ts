@@ -59,13 +59,56 @@ fastifyPlugins.push(caching);
 
 fastify.get("/", async(req, res) => {
     res.type("application/json").code(200);
-    return "Welcome to Anify API.";
+    return `
+    Welcome to Anify API.\n
+    ---------------------\n
+    API Documentation:\n
+    GET /all/:type - List all anime or manga.\n
+    GET /stats - Get the amount of anime and manga in the database.\n
+    GET /login - Redirects to AniList login page.\n
+    GET /auth - Redirects to main frontend page.\n
+    POST /viewer - Get the viewer's AniList profile.\n
+    GET /user/:username - Get a user's AniList profile.\n
+    POST /user - Get a user's AniList profile.\n
+    POST /update_list - Update a user's AniList list.\n
+    GET /list/:userId/:type - Get a user's AniList list.\n
+    POST /list - Get a user's AniList list.\n
+    GET /seasonal/:type/:season - Get seasonal anime or manga.\n
+    POST /seasonal/:type - Get seasonal anime or manga.\n
+    GET /search/:type/:query - Search for anime or manga.\n
+    POST /search/:type - Search for anime or manga.\n
+    GET /info/:id - Get anime or manga info.\n
+    POST /info - Get anime or manga info.\n
+    GET /relations/:id - Get anime or manga relations.\n
+    POST /relations - Get anime or manga relations.\n
+    GET /episodes/:id - Get anime episodes.\n
+    POST /episodes - Get anime episodes.\n
+    GET /chapters/:id - Get manga chapters.\n
+    POST /chapters - Get manga chapters.\n
+    GET /sources/:id/:provider/:watchId - Get anime sources.\n
+    POST /sources - Get anime sources.\n
+    GET /pages/:id/:provider/:readId - Get manga pages.\n
+    POST /pages - Get manga pages.\n`;
 })
 
 fastify.get("/all/:type", async(req, res) => {
-    const anime = await aniSync.getAll(Type.ANIME);
-    res.type("application/json").code(200);
-    return anime;
+    const type = req.params["type"];
+    if (!type) {
+        res.type("application/json").code(400);
+        return { error: "No type provided." };
+    }
+    if (type.toLowerCase() === "anime") {
+        const anime = await aniSync.getAll(Type.ANIME);
+        res.type("application/json").code(200);
+        return anime;
+    } else if (type.toLowerCase() === "manga") {
+        const manga = await aniSync.getAll(Type.MANGA);
+        res.type("application/json").code(200);
+        return manga;
+    } else {
+        res.type("application/json").code(400);
+        return { error: "Invalid type." };
+    }
 })
 
 fastify.get("/stats", async(req, res) => {
@@ -190,7 +233,7 @@ fastify.get("/seasonal/:type/:season", async(req, res) => {
         return { error: "No season or type provided." };
     }
     if (type.toLowerCase() === "anime") {
-        const data = await aniSync.getSeasonal(Type.ANIME, 20);
+        const data = await aniSync.getSeasonal(Type.ANIME, 8);
 
         if (season.toLowerCase() === "trending") {
             res.type("application/json").code(200);
@@ -212,7 +255,7 @@ fastify.get("/seasonal/:type/:season", async(req, res) => {
             return { error: "Unknown seasonal type." };
         }
     } else if (type.toLowerCase() === "manga") {
-        const data = await aniSync.getSeasonal(Type.MANGA, 20);
+        const data = await aniSync.getSeasonal(Type.MANGA, 8);
 
         if (season.toLowerCase() === "trending") {
             res.type("application/json").code(200);

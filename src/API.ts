@@ -25,15 +25,16 @@ export default class API {
             NEXT_YEAR: 2023,
             oath_id: -1,
             oath_secret: ""
-        }
+        },
+        database_url: "postgresql://postgres:password@localhost:3306"
     }
 
-    constructor(type:ProviderType) {
+    constructor(type:ProviderType, options?) {
         this.providerType = type;
-        this.loadConfig();
+        this.loadConfig(options);
     }
 
-    private loadConfig() {
+    private loadConfig(options?) {
         if (process.env.DEBUG) {
             this.config.debug = process.env.DEBUG.toLowerCase() === "true";
         }
@@ -81,6 +82,16 @@ export default class API {
         }
         if (process.env.ANILIST_OATH_SECRET) {
             this.config.AniList.oath_secret = process.env.ANILIST_OATH_SECRET;
+        }
+        if (process.env.DATABASE_URL) {
+            this.config.database_url = process.env.DATABASE_URL;
+        }
+
+        if (options) {
+            this.config = {
+                ...this.config,
+                ...options
+            }
         }
     }
 

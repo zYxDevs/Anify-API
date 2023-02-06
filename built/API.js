@@ -4,7 +4,7 @@ exports.ProviderType = void 0;
 const promise_request_1 = require("./libraries/promise-request");
 const CryptoJS = require("crypto-js");
 class API {
-    constructor(type) {
+    constructor(type, options) {
         this.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36';
         this.config = {
             debug: true,
@@ -26,12 +26,13 @@ class API {
                 NEXT_YEAR: 2023,
                 oath_id: -1,
                 oath_secret: ""
-            }
+            },
+            database_url: "postgresql://postgres:password@localhost:3306"
         };
         this.providerType = type;
-        this.loadConfig();
+        this.loadConfig(options);
     }
-    loadConfig() {
+    loadConfig(options) {
         if (process.env.DEBUG) {
             this.config.debug = process.env.DEBUG.toLowerCase() === "true";
         }
@@ -79,6 +80,15 @@ class API {
         }
         if (process.env.ANILIST_OATH_SECRET) {
             this.config.AniList.oath_secret = process.env.ANILIST_OATH_SECRET;
+        }
+        if (process.env.DATABASE_URL) {
+            this.config.database_url = process.env.DATABASE_URL;
+        }
+        if (options) {
+            this.config = {
+                ...this.config,
+                ...options
+            };
         }
     }
     async fetch(url, options) {

@@ -28,8 +28,8 @@ export default class Core extends API {
 
     public classDictionary:Provider[] = [];
 
-    constructor() {
-        super(ProviderType.NONE);
+    constructor(options?:Options) {
+        super(ProviderType.NONE, options);
 
         dotenv.config();
 
@@ -98,6 +98,13 @@ export default class Core extends API {
                 //object: new LiveChart(),
             //}
         ]
+    }
+
+    /**
+     * @description Initializes the database
+     */
+    public async init() {
+        await this.db.init();
     }
 
     /**
@@ -926,6 +933,30 @@ interface SeasonalResponse {
 interface Content {
     provider: string;
     episodes: Episode[]
+}
+
+interface Options {
+    debug?: boolean,
+    cache_timeout?: number,
+    encryptionKey?: string,
+    storage?: string,
+    isMacOS?: boolean,
+    poppler_path?: string,
+    web_server: {
+        url?: string,
+        main_url?: string,
+        cors?: [string],
+        port?: number
+    },
+    AniList: {
+        SEASON?: string,
+        SEASON_YEAR?: number,
+        NEXT_SEASON?: string,
+        NEXT_YEAR?: number,
+        oath_id?: number,
+        oath_secret?: string
+    },
+    database_url?: string,
 }
 
 export type { Result, Provider, FormattedResponse, SearchResponse, Content };

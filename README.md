@@ -42,9 +42,18 @@ The API supports the following manga sites:
 - [x] [MangaDex](https://mangadex.org)
 - [x] [ComicK](https://comick.app)
 - [x] [Mangakakalot](https://mangakakalot.com)
+- [x] [MangaPark](https://v2.mangapark.net)
+- [x] [MangaSee](https://mangasee123.com)
+
+## Meta
+The API supports the following meta providers:
+- [x] [AnimeThemes](https://animethemes.moe)
+- [x] [Kitsu](https://kitsu.io)
+- [x] [LiveChart](https://www.livechart.me)
+- [x] [TMDB](https://www.themoviedb.org)
 
 ## Using as a Library
-Anify API can be used as... well, an API. It is mainly meant to be used as a REST API, but it can also be used as a library. You can install the NPM package like this:
+Anify API can be used as a library. It is mainly meant to be used as a REST API, but it has some other uses as well. You can install the NPM package like this:
 ```bash
 npm i anify.js
 ```
@@ -55,6 +64,13 @@ import Anify from "anify.js"
 
 // CommonJS
 const Anify = require("anify.js").default;
+
+// You will likely need to provide a database URL in the options path
+// The URL is postgresql://{username}:{password}@{host}:{port}/{database_name}
+// database_name can be an optional value as shown below
+const anify = new Anify({ database_url: "postgresql://postgres:password@localhost:3306" });
+
+// It is recommended that you cd into /node_modules/anify.js and run npm run build.
 ```
 Please view [this](https://github.com/Eltik/Anify-API/issues/1) for more information. If you need help with development, join our [Discord](https://anify.tv/discord) and view the [#help](https://discord.com/channels/950964096600252507/1071533139631026287) channel.
 
