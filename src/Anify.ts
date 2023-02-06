@@ -1,5 +1,5 @@
 import API, { ProviderType } from "./API";
-import AniList, { Type, Media } from "./meta/AniList";
+import AniList, { Type, Media, Format } from "./meta/AniList";
 import { compareTwoStrings } from "./libraries/StringSimilarity";
 import AnimeFox from "./anime/AnimeFox";
 import GogoAnime from "./anime/GogoAnime";
@@ -15,6 +15,8 @@ import DB from "./DB";
 import * as config from "./config.json";
 import * as colors from "colors";
 import { Episode, Page, SubbedSource } from "./Provider";
+import AnimeThemes from "./meta/AnimeThemes";
+import TMDB from "./meta/TMDB";
 
 export default class Sync extends API {
     public aniList = new AniList();
@@ -68,6 +70,14 @@ export default class Sync extends API {
             {
                 name: "MangaSee",
                 object: new MangaSee(),
+            },
+            {
+                name: "AnimeThemes",
+                object: new AnimeThemes(),
+            },
+            {
+                name: "TMDB",
+                object: new TMDB(),
             }
         ]
     }
@@ -136,7 +146,13 @@ export default class Sync extends API {
                 let best: any = null;
     
                 aniList.map(async (result:any) => {
-                    const title = result.title.userPreferred;
+                    if (type === Type.MANGA) {
+                        if (result.format === Format.NOVEL) {
+                            return;
+                        }
+                    }
+
+                    const title = result.title.userPreferred || result.title.romaji || result.title.english || result.title.native;
                     const altTitles:any[] = Object.values(result.title).concat(result.synonyms);
                     const aniList = result;
     
@@ -189,7 +205,7 @@ export default class Sync extends API {
                 let best: any = null;
 
                 aniSearch.map(async (result:any) => {
-                    const title = result.title.userPreferred;
+                    const title = result.title.userPreferred || result.title.romaji || result.title.english || result.title.native;
                     const altTitles:any[] = Object.values(result.title).concat(result.synonyms);
                     const aniList = result;
     
