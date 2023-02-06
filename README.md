@@ -20,7 +20,7 @@ The API supports the following manga sites:
 ## Using as a Library
 Anify API can be used as... well, an API. It is mainly meant to be used as a REST API, but it can also be used as a library. You can install the NPM package like this:
 ```bash
-npm i anify
+npm i anify.js
 ```
 Then import the class in your JavaScript project:
 ```javascript

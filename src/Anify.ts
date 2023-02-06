@@ -17,6 +17,9 @@ import * as colors from "colors";
 import { Episode, Page, SubbedSource } from "./Provider";
 import AnimeThemes from "./meta/AnimeThemes";
 import TMDB from "./meta/TMDB";
+import KitsuAnime from "./meta/KitsuAnime";
+import KitsuManga from "./meta/KitsuManga";
+import LiveChart from "./meta/LiveChart";
 
 export default class Sync extends API {
     public aniList = new AniList();
@@ -78,6 +81,18 @@ export default class Sync extends API {
             {
                 name: "TMDB",
                 object: new TMDB(),
+            },
+            {
+                name: "KitsuAnime",
+                object: new KitsuAnime(),
+            },
+            {
+                name: "KitsuManga",
+                object: new KitsuManga(),
+            },
+            {
+                name: "LiveChart",
+                object: new LiveChart(),
             }
         ]
     }

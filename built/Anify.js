@@ -16,6 +16,11 @@ const MangaSee_1 = require("./manga/MangaSee");
 const DB_1 = require("./DB");
 const config = require("./config.json");
 const colors = require("colors");
+const AnimeThemes_1 = require("./meta/AnimeThemes");
+const TMDB_1 = require("./meta/TMDB");
+const KitsuAnime_1 = require("./meta/KitsuAnime");
+const KitsuManga_1 = require("./meta/KitsuManga");
+const LiveChart_1 = require("./meta/LiveChart");
 class Sync extends API_1.default {
     constructor() {
         super(API_1.ProviderType.NONE);
@@ -64,6 +69,26 @@ class Sync extends API_1.default {
             {
                 name: "MangaSee",
                 object: new MangaSee_1.default(),
+            },
+            {
+                name: "AnimeThemes",
+                object: new AnimeThemes_1.default(),
+            },
+            {
+                name: "TMDB",
+                object: new TMDB_1.default(),
+            },
+            {
+                name: "KitsuAnime",
+                object: new KitsuAnime_1.default(),
+            },
+            {
+                name: "KitsuManga",
+                object: new KitsuManga_1.default(),
+            },
+            {
+                name: "LiveChart",
+                object: new LiveChart_1.default(),
             }
         ];
     }
@@ -126,7 +151,12 @@ class Sync extends API_1.default {
             for (let j = 0; j < resultsArray[i].length; j++) {
                 let best = null;
                 aniList.map(async (result) => {
-                    const title = result.title.userPreferred;
+                    if (type === AniList_1.Type.MANGA) {
+                        if (result.format === AniList_1.Format.NOVEL) {
+                            return;
+                        }
+                    }
+                    const title = result.title.userPreferred || result.title.romaji || result.title.english || result.title.native;
                     const altTitles = Object.values(result.title).concat(result.synonyms);
                     const aniList = result;
                     const sim = this.similarity(title, resultsArray[i][j].title, altTitles);
@@ -172,7 +202,7 @@ class Sync extends API_1.default {
                 const aniSearch = await this.aniList.search(this.sanitizeTitle(resultsArray[i][j].title), type);
                 let best = null;
                 aniSearch.map(async (result) => {
-                    const title = result.title.userPreferred;
+                    const title = result.title.userPreferred || result.title.romaji || result.title.english || result.title.native;
                     const altTitles = Object.values(result.title).concat(result.synonyms);
                     const aniList = result;
                     const sim = this.similarity(title, resultsArray[i][j].title, altTitles);
