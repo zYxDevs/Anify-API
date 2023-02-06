@@ -1,32 +1,6 @@
 # Anify-API
 JavaScript API server for scraping anime and manga sites.
 
-## Installation
-Anify-API requires [PostgreSQL](https://www.postgresql.org/) and [Node.js](https://nodejs.org/en/) to run. On MacOS, you can install PostgreSQL via [Homebrew](https://brew.sh/):
-```bash
-brew install postgresql
-```
-Then, install the dependencies and start the server:
-```bash
-npm i
-brew services start postgresql
-```
-To stop the server, run:
-```bash
-brew services stop postgresql
-```
-
-## Configuration
-Anify-API uses [dotenv](https://www.npmjs.com/package/dotenv) to load environment variables. You can create a `.env` file in the root directory of the project and configure the database URL to setup PostgreSQL.
-```bash
-# .env
-# The URL is formatted as postgres://{username}:{password}@{host}:{port}/{database_name}
-DATABASE_URL="postgres://username:password@localhost:5432/anify"
-
-# Here is an example that I use
-DATABASE_URL="postgresql://postgres:password@localhost:3306"
-```
-
 ## Scraping
 Anify API scrapes numerous anime and manga sites, from Zoro, to GogoAnime, to AnimePahe, and more. The API is built on top of [AniSync](https://github.com/Eltik/AniSync) to map AniList information to streaming sites, allowing for multiple providers in case one ever goes down. To avoid rate limits, the API also caches data for a set amount of time and retrieves it when necessary.
 ## Anime
@@ -53,9 +27,9 @@ The API supports the following meta providers:
 - [x] [TMDB](https://www.themoviedb.org)
 
 ## Using as a Library
-Anify API can be used as a library. It is mainly meant to be used as a REST API, but it has some other uses as well. You can install the NPM package like this:
+Anify API can be used as a library. It is mainly meant to be used as a REST API, but it is entirely possible to be used as an NPM package. You can install the NPM package and all dependencies like this:
 ```bash
-npm i anify.js
+npm i anify.js prisma @prisma/client
 ```
 Then import the class in your JavaScript project:
 ```javascript
@@ -69,11 +43,42 @@ const Anify = require("anify.js").default;
 // The URL is postgresql://{username}:{password}@{host}:{port}/{database_name}
 // database_name can be an optional value as shown below
 const anify = new Anify({ database_url: "postgresql://postgres:password@localhost:3306" });
-
-await anify.init(); // You need to call init() to initialize the database
-
-// It is recommended that you cd into /node_modules/anify.js and run npm run build.
 ```
+You also need [Prisma](https://npmjs.com/package/prisma) and [@prisma/client](https://npmjs.com/package/@prisma/client) to be setup. After installing the NPM packages, create a `prisma` folder in your project and download the copy the `schema.prisma` file into the folder. Your project should look like this:
+```bash
+├── node_modules
+├── prisma
+│   └── schema.prisma
+├── package.json
+└── other_files_here
+```
+Then, run the following command:
+```bash
+npx prisma generate
+```
+Finally, you will need to create a file called `.env` in your project folder. Put `DATABASE_URL="postgresql://postgres:password@localhost:3306"` in the file. You can change the database URL to whatever you want, but make sure to change the `database_url` in the options path to match the URL in the `.env` file.
+```bash
+# .env
+# The URL is formatted as postgres://{username}:{password}@{host}:{port}/{database_name}
+DATABASE_URL="postgres://username:password@localhost:5432/anify"
+
+# Here is an example that I use
+DATABASE_URL="postgresql://postgres:password@localhost:3306"
+```
+
+Anify-API requires [PostgreSQL](https://www.postgresql.org/) to run. On MacOS, you can install PostgreSQL via [Homebrew](https://brew.sh/):
+```bash
+# Installation
+brew install postgresql
+
+# Start the server
+brew services start postgresql
+
+# Stop the server
+brew services stop postgresql
+```
+If you don't have MacOS, you can download PostgreSQL and follow the tutorial on their website. If you want to use a GUI, you can use other tools like [Postico](https://eggerapps.at/postico/).
+
 Please view [this](https://github.com/Eltik/Anify-API/issues/1) for more information. If you need help with development, join our [Discord](https://anify.tv/discord) and view the [#help](https://discord.com/channels/950964096600252507/1071533139631026287) channel.
 
 ## Contribution
