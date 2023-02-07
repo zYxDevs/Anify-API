@@ -38,6 +38,7 @@
         "@fastify/cors": "^8.2.0",
         "@fastify/formbody": "^7.4.0",
         "@fastify/rate-limit": "^7.6.0",
+        "@prisma/client": "^4.8.1",
         "axios": "^1.2.2",
         "cheerio": "^1.0.0-rc.12",
         "colors": "^1.4.0",
@@ -45,8 +46,7 @@
         "dotenv": "^16.0.3",
         "fastify": "^4.12.0",
         "node-poppler": "^6.1.1",
-        "sqlite3": "^5.1.4",
         "prisma": "^4.8.1",
-        "@prisma/client": "^4.8.1"
+        "sqlite3": "^5.1.4"
     }
 }
