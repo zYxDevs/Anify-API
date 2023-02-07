@@ -21,6 +21,7 @@ export default class AnimePahe extends Provider {
     }
 
     public async getEpisodes(id: string): Promise<Episode[]> {
+        id = id.split("/anime/")[1];
         const page = 0;
         const res = await this.fetch(`${this.baseURL}/api?m=release&id=${id}&sort=episode_asc&page=${page}`);
 

@@ -18,6 +18,7 @@ class AnimePahe extends Provider_1.default {
         }));
     }
     async getEpisodes(id) {
+        id = id.split("/anime/")[1];
         const page = 0;
         const res = await this.fetch(`${this.baseURL}/api?m=release&id=${id}&sort=episode_asc&page=${page}`);
         const epData = res.json().data;

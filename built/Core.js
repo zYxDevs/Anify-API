@@ -20,6 +20,7 @@ const TMDB_1 = require("./meta/TMDB");
 const KitsuAnime_1 = require("./meta/KitsuAnime");
 const KitsuManga_1 = require("./meta/KitsuManga");
 const dotenv = require("dotenv");
+const Chiaki_1 = require("./meta/Chiaki");
 class Core extends API_1.default {
     constructor(options) {
         super(API_1.ProviderType.NONE, options);
@@ -93,7 +94,11 @@ class Core extends API_1.default {
             //{
             //name: "LiveChart",
             //object: new LiveChart(),
-            //}
+            //},
+            {
+                name: "Chiaki",
+                object: new Chiaki_1.default(),
+            }
         ];
     }
     /**

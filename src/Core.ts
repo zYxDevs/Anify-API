@@ -20,6 +20,7 @@ import KitsuAnime from "./meta/KitsuAnime";
 import KitsuManga from "./meta/KitsuManga";
 import LiveChart from "./meta/LiveChart";
 import * as dotenv from "dotenv";
+import Chiaki from "./meta/Chiaki";
 
 export default class Core extends API {
     public aniList = new AniList();
@@ -99,7 +100,11 @@ export default class Core extends API {
             //{
                 //name: "LiveChart",
                 //object: new LiveChart(),
-            //}
+            //},
+            {
+                name: "Chiaki",
+                object: new Chiaki(),
+            }
         ]
     }
 
@@ -963,4 +968,4 @@ interface Options {
     is_sqlite?: boolean
 }
 
-export type { Result, Provider, FormattedResponse, SearchResponse, Content };
+export type { Result, Provider, FormattedResponse, SearchResponse, Content, Options };

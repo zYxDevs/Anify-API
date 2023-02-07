@@ -6,8 +6,8 @@
     },
     "name": "anify.js",
     "description": "Advanced web scraper for Japanese media.",
-    "version": "2.0.6",
-    "main": "./built/Core.js",
+    "version": "2.0.8",
+    "main": "./built/Anify.js",
     "scripts": {
         "test": "node ./test.js",
         "build": "npm run build:ts && npm run build:db",
@@ -25,14 +25,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Eltik/AniSync.git"
+        "url": "git+https://github.com/Eltik/Anify-API.git"
     },
     "author": "eltik",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/Eltik/AniSync/issues"
+        "url": "https://github.com/Eltik/Anify-API/issues"
     },
-    "homepage": "https://github.com/Eltik/AniSync#readme",
+    "homepage": "https://github.com/Eltik/Anify-API#readme",
     "dependencies": {
         "@fastify/caching": "^8.2.0",
         "@fastify/cors": "^8.2.0",
