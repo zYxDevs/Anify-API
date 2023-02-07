@@ -14,9 +14,10 @@ export default class Core extends API {
      * @description Searches on AniList and on providers and finds the best results possible.
      * @param query Media to search for.
      * @param type Type of media to search for.
+     * @param ommitUncached Ommit uncached results from the search.
      * @returns Promise<FormattedResponse[]>
      */
-    search(query: string, type: Type): Promise<FormattedResponse[]>;
+    search(query: string, type: Type, ommitUncached?: boolean): Promise<FormattedResponse[]>;
     /**
      * @description Searches for media on AniList and maps the results to providers.
      * @param query Media to search for.
@@ -189,13 +190,13 @@ interface Options {
     storage?: string;
     isMacOS?: boolean;
     poppler_path?: string;
-    web_server: {
+    web_server?: {
         url?: string;
         main_url?: string;
         cors?: [string];
         port?: number;
     };
-    AniList: {
+    AniList?: {
         SEASON?: string;
         SEASON_YEAR?: number;
         NEXT_SEASON?: string;

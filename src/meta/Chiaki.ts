@@ -5,12 +5,12 @@ import { Result } from "../Core";
 export default class Chiaki extends Provider {
 
     constructor() {
-        super("https://chiaka.site", ProviderType.ANIME);
+        super("https://chiaki.site", ProviderType.ANIME);
     }
 
     public async search(query:string): Promise<Array<Result>> {
         // https://chiaki.site/?/tools/autocomplete_series&term=Kaguya-sama
-        const req = await this.fetch(`${this.baseURL}/?/tools/autocomplete_serise&term=${encodeURIComponent(query)}`);
+        const req = await this.fetch(`${this.baseURL}/?/tools/autocomplete_series&term=${encodeURIComponent(query)}`);
         const data:[SearchResult] = req.json();
 
         const results:Array<Result> = [];

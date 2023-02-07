@@ -119,32 +119,56 @@ export default class Core extends API {
      * @description Searches on AniList and on providers and finds the best results possible.
      * @param query Media to search for.
      * @param type Type of media to search for.
+     * @param ommitUncached Ommit uncached results from the search.
      * @returns Promise<FormattedResponse[]>
      */
-     public async search(query:string, type:Type): Promise<FormattedResponse[]> {
+     public async search(query:string, type:Type, ommitUncached:boolean = true): Promise<FormattedResponse[]> {
         let result:FormattedResponse[] = [];
         // Searches first on the database for a result
         const possible = await this.db.search(query, type);
         if (!possible || possible.length === 0) {
-            if (this.config.debug) {
-                console.log(colors.yellow("No results found in database. Searching providers..."));
-                console.log(colors.gray("Searching for ") + colors.blue(query) + colors.gray(" of type ") + colors.blue(type) + colors.gray("..."));
+            if (ommitUncached) {
+                if (this.config.debug) {
+                    console.log(colors.yellow("No results found in database. Searching providers..."));
+                    console.log(colors.gray("Searching for ") + colors.blue(query) + colors.gray(" of type ") + colors.blue(type) + colors.gray("..."));
+                }
+                // Search on AniList first
+                this.aniSearch(query, type).then(async(aniSearch) => {
+                    if (this.config.debug) {
+                        console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
+                    }
+                    const aniList = this.searchCompare(result, aniSearch);
+                    // Then search on providers
+                    const pageSearch = await this.pageSearch(query, type);
+                    if (this.config.debug) {
+                        console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
+                    }
+                    // Find the best results possible
+                    const pageList = this.searchCompare(aniList, pageSearch, 0.5);
+                    await this.db.insert(pageList, type);
+                });
+                return [];
+            } else {
+                if (this.config.debug) {
+                    console.log(colors.yellow("No results found in database. Searching providers..."));
+                    console.log(colors.gray("Searching for ") + colors.blue(query) + colors.gray(" of type ") + colors.blue(type) + colors.gray("..."));
+                }
+                // Search on AniList first
+                const aniSearch = await this.aniSearch(query, type);
+                if (this.config.debug) {
+                    console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
+                }
+                const aniList = this.searchCompare(result, aniSearch);
+                // Then search on providers
+                const pageSearch = await this.pageSearch(query, type);
+                if (this.config.debug) {
+                    console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
+                }
+                // Find the best results possible
+                const pageList = this.searchCompare(aniList, pageSearch, 0.5);
+                await this.db.insert(pageList, type);
+                return pageList;
             }
-            // Search on AniList first
-            const aniSearch = await this.aniSearch(query, type);
-            if (this.config.debug) {
-                console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
-            }
-            const aniList = this.searchCompare(result, aniSearch);
-            // Then search on providers
-            const pageSearch = await this.pageSearch(query, type);
-            if (this.config.debug) {
-                console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
-            }
-            // Find the best results possible
-            const pageList = this.searchCompare(aniList, pageSearch, 0.5);
-            await this.db.insert(pageList, type);
-            return pageList;
         } else {
             return possible;
         }
@@ -950,13 +974,13 @@ interface Options {
     storage?: string,
     isMacOS?: boolean,
     poppler_path?: string,
-    web_server: {
+    web_server?: {
         url?: string,
         main_url?: string,
         cors?: [string],
         port?: number
     },
-    AniList: {
+    AniList?: {
         SEASON?: string,
         SEASON_YEAR?: number,
         NEXT_SEASON?: string,

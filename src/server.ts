@@ -9,7 +9,7 @@ import Novels from "./novels/Novels";
 import { Type } from "./meta/AniList";
 import { SubbedSource } from "./Provider";
 
-const aniSync = new Core();
+const aniSync = new Core({ is_sqlite: true });
 const aniList = aniSync.aniList;
 const novels = new Novels();
 
