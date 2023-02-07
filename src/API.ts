@@ -26,7 +26,8 @@ export default class API {
             oath_id: -1,
             oath_secret: ""
         },
-        database_url: "postgresql://postgres:password@localhost:3306"
+        database_url: "postgresql://postgres:password@localhost:3306",
+        is_sqlite: false
     }
 
     constructor(type:ProviderType, options?) {
@@ -85,6 +86,9 @@ export default class API {
         }
         if (process.env.DATABASE_URL) {
             this.config.database_url = process.env.DATABASE_URL;
+        }
+        if (process.env.IS_SQLITE) {
+            this.config.is_sqlite = process.env.IS_SQLITE.toLowerCase() === "true";
         }
 
         if (options) {

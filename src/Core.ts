@@ -30,6 +30,9 @@ export default class Core extends API {
 
     constructor(options?:Options) {
         super(ProviderType.NONE, options);
+        if (options && options.is_sqlite) {
+            this.db = new DB(options.is_sqlite);
+        }
 
         dotenv.config();
 
@@ -957,6 +960,7 @@ interface Options {
         oath_secret?: string
     },
     database_url?: string,
+    is_sqlite?: boolean
 }
 
 export type { Result, Provider, FormattedResponse, SearchResponse, Content };
