@@ -100,6 +100,7 @@ export default class Core extends API {
      * @returns [{ data: FormattedResponse, type: Type, relationType: string }]
      */
     getRelations(id: string): Promise<any[]>;
+    getTMDB(id: string): Promise<any>;
     /**
      * @description Crawls the provider for media.
      * @param type Type of media to crawl

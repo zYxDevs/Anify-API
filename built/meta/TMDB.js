@@ -46,11 +46,28 @@ class TMDB extends Provider_1.default {
     async getInfo(id) {
         const searchUrl = `${id}?api_key=${this.api_key}&language=en-US&append_to_response=release_dates,watch/providers,alternative_titles,credits,external_ids,images,keywords,recommendations,reviews,similar,translations,videos&include_image_language=en`;
         try {
-            const req = await this.fetch(this.apiUrl + searchUrl);
+            const req = await this.fetch(this.apiUrl + searchUrl).catch((err) => {
+                return null;
+            });
+            if (!req) {
+                return null;
+            }
             const json = req.json();
             json.backdrop_path = `https://image.tmdb.org/t/p/original${json.backdrop_path}`;
             json.poster_path = `https://image.tmdb.org/t/p/original${json.poster_path}`;
             return req.json();
+        }
+        catch (e) {
+            throw new Error(e);
+        }
+    }
+    async tvdbToTMDB(id) {
+        const searchUrl = `${this.apiUrl}/3/find${id}?api_key=${this.api_key}&external_source=tvdb_id`;
+        try {
+            const req = await this.fetch(this.apiUrl + searchUrl);
+            const data = req.json();
+            const id = data.tv_results[0] ? data.tv_results[0].id : null;
+            return id;
         }
         catch (e) {
             throw new Error(e);

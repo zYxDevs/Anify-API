@@ -719,6 +719,24 @@ class Core extends API_1.default {
         }
         return results;
     }
+    async getTMDB(id) {
+        const info = await this.get(id);
+        if (!info) {
+            return null;
+        }
+        let data = null;
+        const connectors = info.connectors;
+        for (let i = 0; i < connectors.length; i++) {
+            const id = connectors[i].id;
+            const provider = this.fetchProvider(id);
+            if (provider.provider_name === "TMDB") {
+                data = await provider.provider.getInfo(id.split(provider.provider.baseURL)[1]).catch((err) => {
+                    return { error: err.message };
+                });
+            }
+        }
+        return data;
+    }
     /**
      * @description Crawls the provider for media.
      * @param type Type of media to crawl

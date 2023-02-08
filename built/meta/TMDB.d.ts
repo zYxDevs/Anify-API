@@ -6,4 +6,5 @@ export default class TMDB extends Provider {
     constructor();
     search(query: string): Promise<Array<Result>>;
     getInfo(id: string): Promise<any>;
+    tvdbToTMDB(id: string): Promise<any>;
 }
