@@ -15,4 +15,5 @@ interface StringResult {
     bestMatchIndex: number;
 }
 export declare function compareTwoStrings(first: any, second: any): number;
+export declare function findBestMatch(mainString: any, targetStrings: any): StringResult;
 export {};

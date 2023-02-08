@@ -1,6 +1,6 @@
 import API, { ProviderType } from "./API";
 import AniList, { Type, Media, Format } from "./meta/AniList";
-import { compareTwoStrings } from "./libraries/StringSimilarity";
+import { compareTwoStrings, findBestMatch } from "./libraries/StringSimilarity";
 import AnimeFox from "./anime/AnimeFox";
 import GogoAnime from "./anime/GogoAnime";
 import Enime from "./anime/Enime";
@@ -116,12 +116,34 @@ export default class Core extends API {
     }
 
     /**
-     * @description Searches on AniList and on providers and finds the best results possible.
+     * @description Searches on AniList and on providers and finds the best results possible. Less accurate but a lot faster.
      * @param query Media to search for.
      * @param type Type of media to search for.
      * @returns Promise<FormattedResponse[]>
      */
      public async search(query:string, type:Type): Promise<FormattedResponse[]> {
+        // Searches first on the database for a result
+        const possible = await this.db.search(query, type);
+        if (!possible || possible.length === 0) {
+            if (this.config.debug) {
+                console.log(colors.yellow("No results found in database. Searching providers..."));
+                console.log(colors.gray("Searching for ") + colors.blue(query) + colors.gray(" of type ") + colors.blue(type) + colors.gray("..."));
+            }
+            const results = await this.testSearch(query, type);
+            //this.db.insert(results, type);
+            return results;
+        } else {
+            return possible;
+        }
+    }
+
+    /**
+     * @description Searches on AniList and on providers and finds the best results possible. Very accurate but a lot slower.
+     * @param query Media to search for.
+     * @param type Type of media to search for.
+     * @returns Promise<FormattedResponse[]>
+     */
+    public async searchAccurate(query:string, type:Type): Promise<FormattedResponse[]> {
         let result:FormattedResponse[] = [];
         // Searches first on the database for a result
         const possible = await this.db.search(query, type);
@@ -148,6 +170,66 @@ export default class Core extends API {
         } else {
             return possible;
         }
+    }
+
+    public async testSearch(query:string, type:Type): Promise<FormattedResponse[]> {
+        const aniList = await this.aniList.search(query, type);
+        if (this.config.debug) {
+            console.log(colors.gray("Received response from AniList."));
+        }
+
+        const results:SearchResponse[] = [];
+
+        for (let i = 0; i < aniList.length; i++) {
+            // Loop through every result
+            const ani = aniList[i];
+            const title = ani.title.userPreferred ?? ani.title.romaji ?? ani.title.english ?? ani.title.native;
+
+            const promises = [];
+            for (let i = 0; i < this.classDictionary.length; i++) {
+                const provider:any = this.classDictionary[i];
+                if (provider.object.providerType === type) {
+                    promises.push(provider.object.search(title));
+                }
+            }
+            const resultsArray = await Promise.all(promises);
+            
+            // Start looping through every provider
+            for (let j = 0; j < resultsArray.length; j++) {
+                // Loop through every provider result
+                const providerResults = resultsArray[j];
+                const providerTitles = providerResults.map((item:any) => item.title.toLowerCase() as string);
+                if (providerTitles.length === 0) {
+                    continue;
+                }
+                const titles = Object.values(ani.title).concat(ani.synonyms);
+
+                const temp = [];
+                for (let k = 0; k < titles.length; k++) {
+                    const title = titles[k];
+                    if (!title) {
+                        continue;
+                    }
+                    const match = findBestMatch(title.toLowerCase(), providerTitles)
+                    const result = providerResults[match.bestMatchIndex];
+                    temp.push({ result: result, similarity: match.bestMatch.rating });
+                }
+                let best = 0;
+                let bestIndex = 0;
+                for (let k = 0; k < temp.length; k++) {
+                    if (temp[k].similarity > best) {
+                        best = temp[k].similarity;
+                        bestIndex = k;
+                    }
+                }
+                results.push({
+                    id: temp[bestIndex].result.url,
+                    data: ani,
+                    similarity: { same: best > 0.5, value: best },
+                });
+            }
+        }
+        return this.formatSearch(results);
     }
 
     /**
@@ -278,7 +360,7 @@ export default class Core extends API {
             let result:FormattedResponse = null;
             const results = await this.search(aniList.title.userPreferred, aniList.type);
             for (let i = 0; i < results.length; i++) {
-                if (results[i].id === id) {
+                if (Number(results[i].id) === Number(id)) {
                     result = results[i];
                 }
             }
@@ -805,7 +887,7 @@ export default class Core extends API {
                             for (let l = 0; l < newVal[j].connectors.length; l++) {
                                 if (curVal[i].connectors[k].id === newVal[j].connectors[l].id) {
                                     // Compare similarity
-                                    if (newVal[j].connectors[l].similarity < threshold || curVal[i].connectors[k].similarity.value >= newVal[j].connectors[l].similarity.value) {
+                                    if (newVal[j].connectors[l].similarity.value < threshold || curVal[i].connectors[k].similarity.value >= newVal[j].connectors[l].similarity.value) {
                                         connectors.push(curVal[i].connectors[k]);
                                     } else {
                                         connectors.push(newVal[j].connectors[l]);

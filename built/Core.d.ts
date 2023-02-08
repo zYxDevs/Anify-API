@@ -11,13 +11,20 @@ export default class Core extends API {
      */
     init(): Promise<void>;
     /**
-     * @description Searches on AniList and on providers and finds the best results possible.
+     * @description Searches on AniList and on providers and finds the best results possible. Less accurate but a lot faster.
      * @param query Media to search for.
      * @param type Type of media to search for.
-     * @param ommitUncached Ommit uncached results from the search.
      * @returns Promise<FormattedResponse[]>
      */
-    search(query: string, type: Type, ommitUncached?: boolean): Promise<FormattedResponse[]>;
+    search(query: string, type: Type): Promise<FormattedResponse[]>;
+    /**
+     * @description Searches on AniList and on providers and finds the best results possible. Very accurate but a lot slower.
+     * @param query Media to search for.
+     * @param type Type of media to search for.
+     * @returns Promise<FormattedResponse[]>
+     */
+    searchAccurate(query: string, type: Type): Promise<FormattedResponse[]>;
+    testSearch(query: string, type: Type): Promise<FormattedResponse[]>;
     /**
      * @description Searches for media on AniList and maps the results to providers.
      * @param query Media to search for.
