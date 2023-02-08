@@ -129,9 +129,17 @@ export default class Core extends API {
                 console.log(colors.yellow("No results found in database. Searching providers..."));
                 console.log(colors.gray("Searching for ") + colors.blue(query) + colors.gray(" of type ") + colors.blue(type) + colors.gray("..."));
             }
+            const aniSearch = await this.aniSearch(query, type);
+            if (this.config.debug) {
+                console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
+            }
             const results = await this.testSearch(query, type);
+            if (this.config.debug) {
+                console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
+            }
+            const res = this.searchCompare(aniSearch, results, 0.5);
             //this.db.insert(results, type);
-            return results;
+            return res;
         } else {
             return possible;
         }
@@ -174,9 +182,6 @@ export default class Core extends API {
 
     public async testSearch(query:string, type:Type): Promise<FormattedResponse[]> {
         const aniList = await this.aniList.search(query, type);
-        if (this.config.debug) {
-            console.log(colors.gray("Received response from AniList."));
-        }
 
         const results:SearchResponse[] = [];
 
@@ -198,11 +203,12 @@ export default class Core extends API {
             for (let j = 0; j < resultsArray.length; j++) {
                 // Loop through every provider result
                 const providerResults = resultsArray[j];
-                const providerTitles = providerResults.map((item:any) => item.title.toLowerCase() as string);
+                const providerTitles = providerResults.map((item:any) => this.sanitizeTitle(item.title.toLowerCase()) as string);
                 if (providerTitles.length === 0) {
                     continue;
                 }
-                const titles = Object.values(ani.title).concat(ani.synonyms);
+                //const titles = Object.values(ani.title).concat(ani.synonyms);
+                const titles = Object.values(ani.title);
 
                 const temp = [];
                 for (let k = 0; k < titles.length; k++) {
