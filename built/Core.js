@@ -246,7 +246,12 @@ class Core extends API_1.default {
         const results = [];
         for (let i = 0; i < aniList.length; i++) {
             const ani = aniList[i];
-            const response = await this.fetch(`https://api.malsync.moe/mal/${type.toLowerCase()}/${ani.idMal}`);
+            const response = await this.fetch(`https://api.malsync.moe/mal/${type.toLowerCase()}/${ani.idMal}`).catch((err) => {
+                return null;
+            });
+            if (!response) {
+                continue;
+            }
             const data = response.json();
             if (data.code === 404) {
                 throw new Error("Not found.");
