@@ -23,22 +23,35 @@ export default class Core extends API {
      * @param type Type of media to search for.
      * @returns Promise<FormattedResponse[]>
      */
-    searchAccurate(query: string, type: Type): Promise<FormattedResponse[]>;
-    testSearch(query: string, type: Type): Promise<FormattedResponse[]>;
+    searchAlt(query: string, type: Type): Promise<FormattedResponse[]>;
+    /**
+     * @description Searches on AniList first then maps each item to a provider. Finds the best results and returns a list of data.
+     * @param query Media to search for.
+     * @param type Type of media to search for.
+     * @returns Promise<FormattedResponse[]>
+     */
+    private testSearch;
+    /**
+     * @description Gets results from MALSync
+     * @param query Media to search for.
+     * @param type Type of media to search for.
+     * @returns Promise<FormattedResponse[]>
+     */
+    private malSync;
     /**
      * @description Searches for media on AniList and maps the results to providers.
      * @param query Media to search for.
      * @param type Type of media to search for.
      * @returns Promise<FormattedResponse[]>
      */
-    aniSearch(query: string, type: Type): Promise<FormattedResponse[]>;
+    private aniSearch;
     /**
      * @description Searches for media on all providers and maps the results to AniList.
      * @param query Media to search for.
      * @param type Type of media to search for.
      * @returns Promise<FormattedResponse[]>
      */
-    pageSearch(query: string, type: Type): Promise<FormattedResponse[]>;
+    private pageSearch;
     /**
      *
      * @param id AniList ID of the media to get
@@ -126,6 +139,14 @@ export default class Core extends API {
      * @returns FormattedResponse[]
      */
     private searchCompare;
+    /**
+     * @description Compares two responses and replaces results that have a better response
+     * @param curVal Original response
+     * @param newVal New response to compare
+     * @param threshold Optional minimum threshold required
+     * @returns FormattedResponse[]
+     */
+    private searchCompareSoft;
     /**
      * @description Gets all media cached
      * @param type Type of media to get

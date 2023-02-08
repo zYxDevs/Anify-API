@@ -11,9 +11,9 @@ anify.get("98659").then((data) => {
 })
 */
 anify.search("kaguya-sama love is war season 2", "ANIME").then((res) => {
-    console.log(res[1].data.id);
-    console.log(res[1].data.title)
-    console.log(res[1].connectors);
+    console.log(res[0].data.id);
+    console.log(res[0].data.title)
+    console.log(res[0].connectors);
     const end = new Date(Date.now());
     console.log(colors.gray("Finished fetching data. Request(s) took ") + colors.cyan(String(end.getTime() - start.getTime())) + colors.gray(" milliseconds."));
 });

@@ -133,13 +133,22 @@ export default class Core extends API {
             if (this.config.debug) {
                 console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
             }
+
             const results = await this.testSearch(query, type);
             if (this.config.debug) {
                 console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
             }
+
             const res = this.searchCompare(aniSearch, results, 0.5);
-            //this.db.insert(results, type);
-            return res;
+
+            const malSync = await this.malSync(query, type);
+            if (this.config.debug) {
+                console.log(colors.gray("Received ") + colors.blue("MALSync") + colors.gray(" response."));
+            }
+
+            const final = this.searchCompareSoft(res, malSync, 0.5);
+            this.db.insert(results, type);
+            return final;
         } else {
             return possible;
         }
@@ -151,7 +160,7 @@ export default class Core extends API {
      * @param type Type of media to search for.
      * @returns Promise<FormattedResponse[]>
      */
-    public async searchAccurate(query:string, type:Type): Promise<FormattedResponse[]> {
+    public async searchAlt(query:string, type:Type): Promise<FormattedResponse[]> {
         let result:FormattedResponse[] = [];
         // Searches first on the database for a result
         const possible = await this.db.search(query, type);
@@ -180,7 +189,13 @@ export default class Core extends API {
         }
     }
 
-    public async testSearch(query:string, type:Type): Promise<FormattedResponse[]> {
+    /**
+     * @description Searches on AniList first then maps each item to a provider. Finds the best results and returns a list of data.
+     * @param query Media to search for.
+     * @param type Type of media to search for.
+     * @returns Promise<FormattedResponse[]>
+     */
+    private async testSearch(query:string, type:Type): Promise<FormattedResponse[]> {
         const aniList = await this.aniList.search(query, type);
 
         const results:SearchResponse[] = [];
@@ -207,9 +222,9 @@ export default class Core extends API {
                 if (providerTitles.length === 0) {
                     continue;
                 }
-                //const titles = Object.values(ani.title).concat(ani.synonyms);
                 const titles = Object.values(ani.title);
 
+                // Find the best result out of all the romaji, native, and english titles.
                 const temp = [];
                 for (let k = 0; k < titles.length; k++) {
                     const title = titles[k];
@@ -239,12 +254,67 @@ export default class Core extends API {
     }
 
     /**
+     * @description Gets results from MALSync
+     * @param query Media to search for.
+     * @param type Type of media to search for.
+     * @returns Promise<FormattedResponse[]>
+     */
+    private async malSync(query:string, type:Type): Promise<FormattedResponse[]> {
+        const aniList = await this.aniList.search(query, type);
+
+        const results:FormattedResponse[] = [];
+
+        for (let i = 0; i < aniList.length; i++) {
+            const ani = aniList[i];
+            const response = await this.fetch(`https://api.malsync.moe/mal/${type.toLowerCase()}/${ani.idMal}`);
+            const data = response.json();
+            if (data.code === 404) {
+                throw new Error("Not found.");
+            }
+    
+            const malId = data.id;
+            const malURL = data.url;
+            const malImg = data.image;
+    
+            const aniDbID = data.anidbId;
+    
+            const sitesT = data.Sites as {
+                [k: string]: { [k: string]: { url: string; connector: string; title: string } };
+            };
+    
+            let sites = Object.values(sitesT).map((v, i) => {
+                const obj = [...Object.values(Object.values(sitesT)[i])];
+                const pages = obj.map(v => ({ connector: v.connector, url: v.url, title: v.title }));
+                return pages;
+            }) as any[];
+    
+            sites = sites.flat();
+    
+            const connectors = [];
+            for (let i = 0; i < sites.length; i++) {
+                connectors.push({
+                    id: sites[i].url,
+                    similarity: { same: true, value: 1 }
+                })
+            }
+
+            results.push({
+                id: String(ani.id),
+                data: ani,
+                connectors: connectors
+            })
+            await this.wait(1000); // MALSync timeout
+        }
+        return results;
+    }
+
+    /**
      * @description Searches for media on AniList and maps the results to providers.
      * @param query Media to search for.
      * @param type Type of media to search for.
      * @returns Promise<FormattedResponse[]>
      */
-    public async aniSearch(query:string, type:Type): Promise<FormattedResponse[]> {
+    private async aniSearch(query:string, type:Type): Promise<FormattedResponse[]> {
         const results:SearchResponse[] = [];
 
         const aniList = await this.aniList.search(query, type);
@@ -303,7 +373,7 @@ export default class Core extends API {
      * @param type Type of media to search for.
      * @returns Promise<FormattedResponse[]>
      */
-    public async pageSearch(query:string, type:Type): Promise<FormattedResponse[]> {
+    private async pageSearch(query:string, type:Type): Promise<FormattedResponse[]> {
         const results:SearchResponse[] = [];
 
         const promises = [];
@@ -886,7 +956,7 @@ export default class Core extends API {
         if (curVal.length > 0 && newVal.length > 0) {
             for (let i = 0; i < curVal.length; i++) {
                 for (let j = 0; j < newVal.length; j++) {
-                    if (curVal[i].id === newVal[j].id) {
+                    if (String(curVal[i].id) === String(newVal[j].id)) {
                         // Can compare now
                         const connectors = [];
                         for (let k = 0; k < curVal[i].connectors.length; k++) {
@@ -905,6 +975,63 @@ export default class Core extends API {
                             id: curVal[i].id,
                             data: curVal[i].data,
                             connectors,
+                        });
+                    }
+                }
+            }
+            return res;
+        }
+        if (curVal.length > 0) return curVal;
+        return newVal;
+    }
+
+    /**
+     * @description Compares two responses and replaces results that have a better response
+     * @param curVal Original response
+     * @param newVal New response to compare
+     * @param threshold Optional minimum threshold required
+     * @returns FormattedResponse[]
+     */
+    private searchCompareSoft(curVal:FormattedResponse[], newVal:FormattedResponse[], threshold = 0):FormattedResponse[] {
+        const res = [];
+        if (curVal.length > 0 && newVal.length > 0) {
+            for (let i = 0; i < curVal.length; i++) {
+                for (let j = 0; j < newVal.length; j++) {
+                    if (String(curVal[i].id) === String(newVal[j].id)) {
+                        // Can compare now
+                        const connectors = [];
+                        for (let k = 0; k < curVal[i].connectors.length; k++) {
+                            for (let l = 0; l < newVal[j].connectors.length; l++) {
+                                if (curVal[i].connectors[k].id === newVal[j].connectors[l].id || compareTwoStrings(curVal[i].connectors[k].id, newVal[j].connectors[l].id) > 0.5) {
+                                    // Compare similarity
+                                    if (newVal[j].connectors[l].similarity.value < threshold || curVal[i].connectors[k].similarity.value >= newVal[j].connectors[l].similarity.value) {
+                                        connectors.push(curVal[i].connectors[k]);
+                                    } else {
+                                        connectors.push(newVal[j].connectors[l]);
+                                    }
+                                } else {
+                                    connectors.push(curVal[i].connectors[k]);
+                                }
+                            }
+                        }
+
+                        const newConnectors = [];
+                        for (let k = 0; k < connectors.length; k++) {
+                            const temp = connectors[k];
+                            let canPush = true;
+                            for (let l = 0; l < newConnectors.length; l++) {
+                                if (newConnectors[l].id === temp.id || compareTwoStrings(temp.id, newConnectors[l].id) > 0.8) {
+                                    canPush = false;
+                                }
+                            }
+                            if (canPush) {
+                                newConnectors.push(temp);
+                            }
+                        }
+                        res.push({
+                            id: curVal[i].id,
+                            data: curVal[i].data,
+                            connectors: newConnectors,
                         });
                     }
                 }

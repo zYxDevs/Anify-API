@@ -130,8 +130,13 @@ class Core extends API_1.default {
                 console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
             }
             const res = this.searchCompare(aniSearch, results, 0.5);
-            //this.db.insert(results, type);
-            return res;
+            const malSync = await this.malSync(query, type);
+            if (this.config.debug) {
+                console.log(colors.gray("Received ") + colors.blue("MALSync") + colors.gray(" response."));
+            }
+            const final = this.searchCompareSoft(res, malSync, 0.5);
+            this.db.insert(results, type);
+            return final;
         }
         else {
             return possible;
@@ -143,7 +148,7 @@ class Core extends API_1.default {
      * @param type Type of media to search for.
      * @returns Promise<FormattedResponse[]>
      */
-    async searchAccurate(query, type) {
+    async searchAlt(query, type) {
         let result = [];
         // Searches first on the database for a result
         const possible = await this.db.search(query, type);
@@ -172,6 +177,12 @@ class Core extends API_1.default {
             return possible;
         }
     }
+    /**
+     * @description Searches on AniList first then maps each item to a provider. Finds the best results and returns a list of data.
+     * @param query Media to search for.
+     * @param type Type of media to search for.
+     * @returns Promise<FormattedResponse[]>
+     */
     async testSearch(query, type) {
         const aniList = await this.aniList.search(query, type);
         const results = [];
@@ -195,8 +206,8 @@ class Core extends API_1.default {
                 if (providerTitles.length === 0) {
                     continue;
                 }
-                //const titles = Object.values(ani.title).concat(ani.synonyms);
                 const titles = Object.values(ani.title);
+                // Find the best result out of all the romaji, native, and english titles.
                 const temp = [];
                 for (let k = 0; k < titles.length; k++) {
                     const title = titles[k];
@@ -223,6 +234,49 @@ class Core extends API_1.default {
             }
         }
         return this.formatSearch(results);
+    }
+    /**
+     * @description Gets results from MALSync
+     * @param query Media to search for.
+     * @param type Type of media to search for.
+     * @returns Promise<FormattedResponse[]>
+     */
+    async malSync(query, type) {
+        const aniList = await this.aniList.search(query, type);
+        const results = [];
+        for (let i = 0; i < aniList.length; i++) {
+            const ani = aniList[i];
+            const response = await this.fetch(`https://api.malsync.moe/mal/${type.toLowerCase()}/${ani.idMal}`);
+            const data = response.json();
+            if (data.code === 404) {
+                throw new Error("Not found.");
+            }
+            const malId = data.id;
+            const malURL = data.url;
+            const malImg = data.image;
+            const aniDbID = data.anidbId;
+            const sitesT = data.Sites;
+            let sites = Object.values(sitesT).map((v, i) => {
+                const obj = [...Object.values(Object.values(sitesT)[i])];
+                const pages = obj.map(v => ({ connector: v.connector, url: v.url, title: v.title }));
+                return pages;
+            });
+            sites = sites.flat();
+            const connectors = [];
+            for (let i = 0; i < sites.length; i++) {
+                connectors.push({
+                    id: sites[i].url,
+                    similarity: { same: true, value: 1 }
+                });
+            }
+            results.push({
+                id: String(ani.id),
+                data: ani,
+                connectors: connectors
+            });
+            await this.wait(1000); // MALSync timeout
+        }
+        return results;
     }
     /**
      * @description Searches for media on AniList and maps the results to providers.
@@ -828,7 +882,7 @@ class Core extends API_1.default {
         if (curVal.length > 0 && newVal.length > 0) {
             for (let i = 0; i < curVal.length; i++) {
                 for (let j = 0; j < newVal.length; j++) {
-                    if (curVal[i].id === newVal[j].id) {
+                    if (String(curVal[i].id) === String(newVal[j].id)) {
                         // Can compare now
                         const connectors = [];
                         for (let k = 0; k < curVal[i].connectors.length; k++) {
@@ -848,6 +902,64 @@ class Core extends API_1.default {
                             id: curVal[i].id,
                             data: curVal[i].data,
                             connectors,
+                        });
+                    }
+                }
+            }
+            return res;
+        }
+        if (curVal.length > 0)
+            return curVal;
+        return newVal;
+    }
+    /**
+     * @description Compares two responses and replaces results that have a better response
+     * @param curVal Original response
+     * @param newVal New response to compare
+     * @param threshold Optional minimum threshold required
+     * @returns FormattedResponse[]
+     */
+    searchCompareSoft(curVal, newVal, threshold = 0) {
+        const res = [];
+        if (curVal.length > 0 && newVal.length > 0) {
+            for (let i = 0; i < curVal.length; i++) {
+                for (let j = 0; j < newVal.length; j++) {
+                    if (String(curVal[i].id) === String(newVal[j].id)) {
+                        // Can compare now
+                        const connectors = [];
+                        for (let k = 0; k < curVal[i].connectors.length; k++) {
+                            for (let l = 0; l < newVal[j].connectors.length; l++) {
+                                if (curVal[i].connectors[k].id === newVal[j].connectors[l].id || (0, StringSimilarity_1.compareTwoStrings)(curVal[i].connectors[k].id, newVal[j].connectors[l].id) > 0.5) {
+                                    // Compare similarity
+                                    if (newVal[j].connectors[l].similarity.value < threshold || curVal[i].connectors[k].similarity.value >= newVal[j].connectors[l].similarity.value) {
+                                        connectors.push(curVal[i].connectors[k]);
+                                    }
+                                    else {
+                                        connectors.push(newVal[j].connectors[l]);
+                                    }
+                                }
+                                else {
+                                    connectors.push(curVal[i].connectors[k]);
+                                }
+                            }
+                        }
+                        const newConnectors = [];
+                        for (let k = 0; k < connectors.length; k++) {
+                            const temp = connectors[k];
+                            let canPush = true;
+                            for (let l = 0; l < newConnectors.length; l++) {
+                                if (newConnectors[l].id === temp.id || (0, StringSimilarity_1.compareTwoStrings)(temp.id, newConnectors[l].id) > 0.8) {
+                                    canPush = false;
+                                }
+                            }
+                            if (canPush) {
+                                newConnectors.push(temp);
+                            }
+                        }
+                        res.push({
+                            id: curVal[i].id,
+                            data: curVal[i].data,
+                            connectors: newConnectors,
                         });
                     }
                 }
