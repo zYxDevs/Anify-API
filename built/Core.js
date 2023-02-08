@@ -135,7 +135,7 @@ class Core extends API_1.default {
                 console.log(colors.gray("Received ") + colors.blue("MALSync") + colors.gray(" response."));
             }
             const final = this.searchCompareSoft(res, malSync, 0.5);
-            this.db.insert(results, type);
+            this.db.insert(final, type);
             return final;
         }
         else {
@@ -945,20 +945,35 @@ class Core extends API_1.default {
                                 }
                                 else {
                                     connectors.push(curVal[i].connectors[k]);
+                                    connectors.push(newVal[j].connectors[l]);
                                 }
                             }
                         }
                         const newConnectors = [];
-                        for (let k = 0; k < connectors.length; k++) {
-                            const temp = connectors[k];
+                        // Only include the best connectors
+                        for (let l = 0; l < connectors.length; l++) {
+                            let best = -1;
+                            let bestSimilarity = 0;
+                            const connector = connectors[l];
+                            for (let m = 0; m < connectors.length; m++) {
+                                const possible = connectors[m];
+                                // If the two connectors are similar/the same
+                                if (connector.id === possible.id || (0, StringSimilarity_1.compareTwoStrings)(connector.id, possible.id) > 0.7) {
+                                    if (possible.similarity.value > bestSimilarity) {
+                                        best = m;
+                                        bestSimilarity = possible.similarity.value;
+                                    }
+                                }
+                            }
+                            const possible = best > -1 ? connectors[best] : connector;
                             let canPush = true;
-                            for (let l = 0; l < newConnectors.length; l++) {
-                                if (newConnectors[l].id === temp.id || (0, StringSimilarity_1.compareTwoStrings)(temp.id, newConnectors[l].id) > 0.8) {
+                            for (let m = 0; m < newConnectors.length; m++) {
+                                if (newConnectors[m].id === possible.id || (0, StringSimilarity_1.compareTwoStrings)(newConnectors[m].id, possible.id) > 0.7) {
                                     canPush = false;
                                 }
                             }
                             if (canPush) {
-                                newConnectors.push(temp);
+                                newConnectors.push(possible);
                             }
                         }
                         res.push({
