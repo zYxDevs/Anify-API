@@ -134,6 +134,17 @@ export default class Core extends API {
                 console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
             }
 
+            const temp = [];
+            for (let i = 0; i < aniSearch.length; i++) {
+                const dbQuery = await this.db.get(String(aniSearch[i].id), type);
+                if (dbQuery != null) {
+                    temp.push(dbQuery);
+                }
+            }
+            if (temp.length > 0) {
+                return temp;
+            }
+
             const results = await this.testSearch(query, type);
             if (this.config.debug) {
                 console.log(colors.gray("Received ") + colors.blue("Provider") + colors.gray(" response."));
@@ -174,6 +185,18 @@ export default class Core extends API {
             if (this.config.debug) {
                 console.log(colors.gray("Received ") + colors.blue("AniList") + colors.gray(" response."));
             }
+
+            const temp = [];
+            for (let i = 0; i < aniSearch.length; i++) {
+                const dbQuery = await this.db.get(String(aniSearch[i].id), type);
+                if (dbQuery != null) {
+                    temp.push(dbQuery);
+                }
+            }
+            if (temp.length > 0) {
+                return temp;
+            }
+
             const aniList = this.searchCompare(result, aniSearch);
             // Then search on providers
             const pageSearch = await this.pageSearch(query, type);

@@ -6,7 +6,7 @@
     },
     "name": "anify.js",
     "description": "Advanced web scraper for Japanese media.",
-    "version": "2.0.8",
+    "version": "2.0.9",
     "main": "./built/Anify.js",
     "scripts": {
         "test": "node ./test.js",
