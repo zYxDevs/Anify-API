@@ -719,6 +719,11 @@ class Core extends API_1.default {
         }
         return results;
     }
+    /**
+     * @description Gets the TMDB info of a media
+     * @param id AniList ID
+     * @returns Promise<TMDBResponse>
+     */
     async getTMDB(id) {
         const info = await this.get(id);
         if (!info) {
@@ -733,6 +738,32 @@ class Core extends API_1.default {
                 data = await provider.provider.getInfo(id.split(provider.provider.baseURL)[1]).catch((err) => {
                     return { error: err.message };
                 });
+            }
+        }
+        return data;
+    }
+    async getThemes(id) {
+        const info = await this.get(id);
+        if (!info) {
+            return null;
+        }
+        let data = null;
+        const connectors = info.connectors;
+        for (let i = 0; i < connectors.length; i++) {
+            const id = connectors[i].id;
+            const provider = this.fetchProvider(id);
+            if (provider.provider_name === "AnimeThemes") {
+                data = await provider.provider.getThemes(id.split(provider.provider.baseURL)[1]).catch((err) => {
+                    return { error: err.message };
+                });
+                if (data != null && data.error == null) {
+                    data = data.map((theme) => {
+                        return {
+                            type: theme.type,
+                            url: provider.provider.parseTheme(theme)
+                        };
+                    });
+                }
             }
         }
         return data;

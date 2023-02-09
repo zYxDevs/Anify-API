@@ -11,7 +11,6 @@ class AnimeThemes extends Provider_1.default {
         this.api = "https://api.animethemes.moe";
     }
     async search(query) {
-        // https://api.animethemes.moe/search?page%5Blimit%5D=4&fields%5Bsearch%5D=anime%2Canimethemes%2Cartists%2Cseries%2Cstudios&q=kubo+won%27t+let+me+be+invisible&include%5Banime%5D=animethemes.animethemeentries.videos%2Canimethemes.song%2Cimages&include%5Banimetheme%5D=animethemeentries.videos%2Canime.images%2Csong.artists&include%5Bartist%5D=images%2Csongs&fields%5Banime%5D=name%2Cslug%2Cyear%2Cseason&fields%5Banimetheme%5D=type%2Csequence%2Cslug%2Cgroup%2Cid&fields%5Banimethemeentry%5D=version%2Cepisodes%2Cspoiler%2Cnsfw&fields%5Bvideo%5D=tags%2Cresolution%2Cnc%2Csubbed%2Clyrics%2Cuncen%2Csource%2Coverlap&fields%5Bimage%5D=facet%2Clink&fields%5Bsong%5D=title&fields%5Bartist%5D=name%2Cslug%2Cas&fields%5Bseries%5D=name%2Cslug&fields%5Bstudio%5D=name%2Cslug
         const req = await this.fetch(`${this.api}/search?page%5Blimit%5D=4&fields%5Bsearch%5D=anime%2Canimethemes%2Cartists%2Cseries%2Cstudios&q=${encodeURIComponent(query)}&include%5Banime%5D=animethemes.animethemeentries.videos%2Canimethemes.song%2Cimages&include%5Banimetheme%5D=animethemeentries.videos%2Canime.images%2Csong.artists&include%5Bartist%5D=images%2Csongs&fields%5Banime%5D=name%2Cslug%2Cyear%2Cseason&fields%5Banimetheme%5D=type%2Csequence%2Cslug%2Cgroup%2Cid&fields%5Banimethemeentry%5D=version%2Cepisodes%2Cspoiler%2Cnsfw&fields%5Bvideo%5D=tags%2Cresolution%2Cnc%2Csubbed%2Clyrics%2Cuncen%2Csource%2Coverlap&fields%5Bimage%5D=facet%2Clink&fields%5Bsong%5D=title&fields%5Bartist%5D=name%2Cslug%2Cas&fields%5Bseries%5D=name%2Cslug&fields%5Bstudio%5D=name%2Cslug`);
         const data = req.json();
         const results = [];
@@ -31,6 +30,20 @@ class AnimeThemes extends Provider_1.default {
         // Can access themes via `${this.baseURL}/anime/${slug}/${OP/ED/ED1/etc.}`
         // And also the file via "https://v.animethemes.moe/${filename}.webm"
         return themes;
+    }
+    parseTheme(theme) {
+        const data = [];
+        theme.entries.map((entry) => {
+            entry.videos.map((video) => {
+                data.push(`https://v.animethemes.moe/${video.filename}.webm`);
+            });
+        });
+        return data;
+    }
+    async parseThemeHTML(theme) {
+        const req = await this.fetch(`${this.baseURL}/anime/${theme.slug}/${theme.type}`);
+        const $ = (0, cheerio_1.load)(req.text());
+        return $(`meta[property="og:video"]`).attr("content");
     }
     async getArtist(query) {
         const req = await this.fetch(`${this.api}/artist?page%5Bsize%5D=15&page%5Bnumber%5D=1&q=${encodeURIComponent(query)}&include=images`);

@@ -14,7 +14,7 @@ import MangaSee from "./manga/MangaSee";
 import DB from "./db/DB";
 import * as colors from "colors";
 import { Episode, Page, SubbedSource } from "./Provider";
-import AnimeThemes from "./meta/AnimeThemes";
+import AnimeThemes, { Theme } from "./meta/AnimeThemes";
 import TMDB from "./meta/TMDB";
 import KitsuAnime from "./meta/KitsuAnime";
 import KitsuManga from "./meta/KitsuManga";
@@ -778,6 +778,11 @@ export default class Core extends API {
         return results;
     }
 
+    /**
+     * @description Gets the TMDB info of a media
+     * @param id AniList ID
+     * @returns Promise<TMDBResponse>
+     */
     public async getTMDB(id:string) {
         const info = await this.get(id);
         if (!info) {
@@ -798,6 +803,35 @@ export default class Core extends API {
         return data;
     }
 
+    public async getThemes(id:string) {
+        const info = await this.get(id);
+        if (!info) {
+            return null;
+        }
+        let data = null;
+
+        const connectors = info.connectors;
+        for (let i = 0; i < connectors.length; i++) {
+            const id = connectors[i].id;
+            const provider = this.fetchProvider(id);
+            if (provider.provider_name === "AnimeThemes") {
+                data = await provider.provider.getThemes(id.split(provider.provider.baseURL)[1]).catch((err) => {
+                    return { error: err.message };
+                });
+
+                if (data != null && data.error == null) {
+                    data = data.map((theme) => {
+                        return {
+                            type: theme.type,
+                            url: provider.provider.parseTheme(theme)
+                        }
+                    });
+                }
+            }
+        }
+        return data;
+    }
+
     /**
      * @description Crawls the provider for media.
      * @param type Type of media to crawl
@@ -805,7 +839,6 @@ export default class Core extends API {
      * @returns Promise<any>
      */
      public async crawl(type:Type, maxIds?:number): Promise<FormattedResponse[]> {
-
         const results = [];
 
         let ids = [];

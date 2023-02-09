@@ -5,10 +5,28 @@ export default class AnimeThemes extends Provider {
     private api;
     constructor();
     search(query: string): Promise<Array<Result>>;
-    getThemes(id: string): Promise<any>;
+    getThemes(id: string): Promise<Theme[]>;
+    parseTheme(theme: Theme): any[];
+    parseThemeHTML(theme: Theme): Promise<string>;
     getArtist(query: string): Promise<ArtistResult>;
     getImage(): Promise<ImageResponse>;
     getRecentlyAdded(): Promise<RecentlyAdded>;
+}
+interface Theme {
+    id: number;
+    type: string;
+    sequence: number | null;
+    slug: string;
+    group: number | null;
+    song: {
+        title: string;
+    };
+    animethemeentries?: [Entry];
+    entries?: [Entry];
+    anime?: {
+        name: string;
+        slug: string;
+    };
 }
 interface ImageResponse {
     images: [Image];
@@ -79,6 +97,14 @@ interface Entry {
 interface Video {
     tags: [string];
     __typename: string;
+    resolution: number;
+    nc: boolean;
+    subbed: boolean;
+    lyrics: boolean;
+    uncen: boolean;
+    source: string;
+    overlap: string;
+    filename: string;
 }
 interface ArtistResult {
     artists: [Artist];
@@ -100,4 +126,4 @@ interface Artist {
     slug: string;
     images: [Image];
 }
-export {};
+export type { Theme };
