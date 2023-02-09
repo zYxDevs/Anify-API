@@ -106,7 +106,18 @@ export default class Core extends API {
      * @returns Promise<TMDBResponse>
      */
     getTMDB(id: string): Promise<any>;
+    /**
+     * @description Gets themes from AnimeThemes
+     * @param id AniList ID
+     * @returns Promise<Theme>
+     */
     getThemes(id: string): Promise<any>;
+    /**
+     * @description Gets manga covers from ComicK
+     * @param id AniList ID
+     * @returns Promise<Cover>
+     */
+    getCovers(id: string): Promise<any>;
     /**
      * @description Crawls the provider for media.
      * @param type Type of media to crawl

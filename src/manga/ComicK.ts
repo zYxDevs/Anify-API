@@ -1,6 +1,7 @@
 import { ProviderType } from "../API";
 import Provider, { Chapter, Page } from "../Provider";
 import { Result } from "../Core";
+import { load } from "cheerio";
 
 export default class ComicK extends Provider {
     private api:string = "https://api.comick.app";
@@ -55,12 +56,40 @@ export default class ComicK extends Provider {
         });
     }
 
+    /**
+     * @description Get the covers for a comic
+     * @param id ComicK slug (NOT ComicK ID)
+     * @returns Promise<Array<Cover>>
+     */
+    public async getCovers(id:string): Promise<Array<Cover>> {
+        const req = await this.fetch(`${this.baseURL}${id}/covers`).catch((err) => {
+            return null;
+        });
+        if (!req) {
+            return null;
+        }
+        const $ = load(req.text());
+        const data = JSON.parse($("#__NEXT_DATA__").html());
+        return data.props.pageProps.comic.md_covers;
+    }
+
+    public parseCover(cover:Cover) {
+        return {
+            volume: cover.vol,
+            url: `${this.image}/${cover.b2key}?width=${cover.w}`
+        };
+    }
+
     private async getChaptersFromPage(id:number, page:number): Promise<Array<Chapter>> {
         const data = await this.fetch(`${this.api}/comic/${id}/chapter?page=${page}`);
         const json = data.json();
 
-        return json["chapters"].map((chapter) => {
+        const result:Chapter[] = [];
+        json["chapters"].map((chapter) => {
             let title = '';
+            if (chapter.group_name && chapter.group_name.length > 0) {
+                title += `[${chapter.group_name[0]}] `;
+            }
             if(chapter.vol) {
                 title += `Vol. ${chapter.vol} `;
             }
@@ -68,12 +97,16 @@ export default class ComicK extends Provider {
             if(chapter.title) {
                 title += ` - ${chapter.title}`;
             }
-            return {
-                url: this.api + "/chapter/" + chapter.hid,
-                id: chapter.hid,
-                title: title
-            };
+
+            if (chapter.lang === "en") {
+                result.push({
+                    url: this.api + "/chapter/" + chapter.hid,
+                    id: chapter.hid,
+                    title: title
+                });
+            }
         });
+        return result;
     }
 
     private async getComicId(id:string): Promise<number> {
@@ -137,6 +170,7 @@ interface Comic {
     md_titles: Array<ComicTitles>;
     md_comic_md_genres: Array<ComicGenres>;
     mu_comics: { licensed_in_english: any, mu_comic_categories: Array<ComicCategories> };
+    md_covers: Array<Cover>;
     iso639_1: string;
     lang_name: string;
     lang_native: string;

@@ -533,6 +533,40 @@ fastify.post("/themes", async(req, res) => {
     return data;
 })
 
+fastify.get("/covers/:id", async(req, res) => {
+    const id = req.params["id"]
+
+    if (!id) {
+        res.type("application/json").code(400);
+        return { error: "Invalid request!" };
+    }
+
+    const data = await aniSync.getCovers(id);
+    if (!data) {
+        res.type("application/json").code(404);
+        return { error: "Not found" };
+    }
+    res.type("application/json").code(200);
+    return data;
+})
+
+fastify.post("/covers", async(req, res) => {
+    const id = req.body["id"]
+
+    if (!id) {
+        res.type("application/json").code(400);
+        return { error: "Invalid request!" };
+    }
+
+    const data = await aniSync.getCovers(id);
+    if (!data) {
+        res.type("application/json").code(404);
+        return { error: "Not found" };
+    }
+    res.type("application/json").code(200);
+    return data;
+})
+
 fastify.get("/episodes/:id", async(req, res) => {
     const id = req.params["id"]
 

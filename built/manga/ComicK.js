@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const API_1 = require("../API");
 const Provider_1 = require("../Provider");
+const cheerio_1 = require("cheerio");
 class ComicK extends Provider_1.default {
     constructor() {
         super("https://comick.app", API_1.ProviderType.MANGA);
@@ -46,11 +47,37 @@ class ComicK extends Provider_1.default {
             };
         });
     }
+    /**
+     * @description Get the covers for a comic
+     * @param id ComicK slug (NOT ComicK ID)
+     * @returns Promise<Array<Cover>>
+     */
+    async getCovers(id) {
+        const req = await this.fetch(`${this.baseURL}${id}/covers`).catch((err) => {
+            return null;
+        });
+        if (!req) {
+            return null;
+        }
+        const $ = (0, cheerio_1.load)(req.text());
+        const data = JSON.parse($("#__NEXT_DATA__").html());
+        return data.props.pageProps.comic.md_covers;
+    }
+    parseCover(cover) {
+        return {
+            volume: cover.vol,
+            url: `${this.image}/${cover.b2key}?width=${cover.w}`
+        };
+    }
     async getChaptersFromPage(id, page) {
         const data = await this.fetch(`${this.api}/comic/${id}/chapter?page=${page}`);
         const json = data.json();
-        return json["chapters"].map((chapter) => {
+        const result = [];
+        json["chapters"].map((chapter) => {
             let title = '';
+            if (chapter.group_name && chapter.group_name.length > 0) {
+                title += `[${chapter.group_name[0]}] `;
+            }
             if (chapter.vol) {
                 title += `Vol. ${chapter.vol} `;
             }
@@ -58,12 +85,15 @@ class ComicK extends Provider_1.default {
             if (chapter.title) {
                 title += ` - ${chapter.title}`;
             }
-            return {
-                url: this.api + "/chapter/" + chapter.hid,
-                id: chapter.hid,
-                title: title
-            };
+            if (chapter.lang === "en") {
+                result.push({
+                    url: this.api + "/chapter/" + chapter.hid,
+                    id: chapter.hid,
+                    title: title
+                });
+            }
         });
+        return result;
     }
     async getComicId(id) {
         const req = await this.fetch(`${this.api}${id}`);

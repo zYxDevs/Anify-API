@@ -742,6 +742,11 @@ class Core extends API_1.default {
         }
         return data;
     }
+    /**
+     * @description Gets themes from AnimeThemes
+     * @param id AniList ID
+     * @returns Promise<Theme>
+     */
     async getThemes(id) {
         const info = await this.get(id);
         if (!info) {
@@ -762,6 +767,34 @@ class Core extends API_1.default {
                             type: theme.type,
                             url: provider.provider.parseTheme(theme)
                         };
+                    });
+                }
+            }
+        }
+        return data;
+    }
+    /**
+     * @description Gets manga covers from ComicK
+     * @param id AniList ID
+     * @returns Promise<Cover>
+     */
+    async getCovers(id) {
+        const info = await this.get(id);
+        if (!info) {
+            return null;
+        }
+        let data = null;
+        const connectors = info.connectors;
+        for (let i = 0; i < connectors.length; i++) {
+            const id = connectors[i].id;
+            const provider = this.fetchProvider(id);
+            if (provider.provider_name === "ComicK") {
+                data = await provider.provider.getCovers(id.split(provider.provider.baseURL)[1]).catch((err) => {
+                    return { error: err.message };
+                });
+                if (data != null && !data.error) {
+                    data = data.map((cover) => {
+                        return provider.provider.parseCover(cover);
                     });
                 }
             }
@@ -1027,7 +1060,7 @@ class Core extends API_1.default {
                             for (let m = 0; m < connectors.length; m++) {
                                 const possible = connectors[m];
                                 // If the two connectors are similar/the same
-                                if (connector.id === possible.id || (0, StringSimilarity_1.compareTwoStrings)(connector.id, possible.id) > 0.7) {
+                                if (connector.id === possible.id || (0, StringSimilarity_1.compareTwoStrings)(connector.id, possible.id) > 0.5) {
                                     if (possible.similarity.value > bestSimilarity) {
                                         best = m;
                                         bestSimilarity = possible.similarity.value;
