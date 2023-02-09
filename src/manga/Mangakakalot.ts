@@ -23,7 +23,7 @@ export default class Mangakakalot extends Provider {
             body: `searchword=${encodeURIComponent(this.parseQuery(query))}`
         });
         const json = data.json();
-        if (json.length > 0) {
+        if (json.length > 0 && json[0].id) {
             const results = json.map((result:SearchResult) => {
                 const uri = new URL(result.story_link);
                 return {

@@ -10,7 +10,7 @@ anify.search("In/Spectre season 2", "ANIME").then((data) => {
     console.log(data[0].connectors);
 })
 */
-anify.get("126529").then((data) => {
+anify.get("21519").then((data) => {
     console.log(data);
     console.log(data.id)
     console.log(data.data.idMal);
