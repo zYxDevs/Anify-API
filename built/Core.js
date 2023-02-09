@@ -21,6 +21,7 @@ const KitsuAnime_1 = require("./meta/KitsuAnime");
 const KitsuManga_1 = require("./meta/KitsuManga");
 const dotenv = require("dotenv");
 const Chiaki_1 = require("./meta/Chiaki");
+const Animek_1 = require("./meta/Animek");
 class Core extends API_1.default {
     constructor(options) {
         super(API_1.ProviderType.NONE, options);
@@ -427,6 +428,50 @@ class Core extends API_1.default {
         }
     }
     /**
+     * @description Gets media based on the MAL ID. Only returns CACHED data.
+     * @param id MAL ID of the media to get
+     * @param type Type of media to get
+     * @returns Promise<FormattedResponse>
+     */
+    async getMal(id, type) {
+        const data = await this.getAll(type);
+        for (let i = 0; i < data.length; i++) {
+            const malId = data[i].data.idMal;
+            if (malId && malId === Number(id)) {
+                return data[i];
+            }
+        }
+    }
+    /**
+     * @description Gets the airing schedule and returns cached data.
+     * @returns Promise<FormattedResponse[]> - Modified to include the date airing and day airing
+     */
+    async getSchedule(start = 0, max = 10) {
+        const result = [];
+        const animek = new Animek_1.default();
+        const animekData = await animek.getSchedule(start, max);
+        const stored = await this.getAll(AniList_1.Type.ANIME);
+        for (let i = 0; i < animekData.length; i++) {
+            const data = stored.find((el) => String(el.data.idMal) === String(animekData[i].idMal));
+            /*
+            const data:any = stored.find((el) => {
+                if (String(el.data.idMal) === String(animekData[i].idMal)) {
+                    return el;
+                } else {
+                    return null;
+                }
+            })
+            */
+            if (!data) {
+                continue;
+            }
+            data.date = animekData[i].datetime;
+            data.day = animekData[i].day;
+            result.push(data);
+        }
+        return result;
+    }
+    /**
      *
      * @param type Type of media to query
      * @param amount Amount of media to get
@@ -820,7 +865,7 @@ class Core extends API_1.default {
             throw new Error("Unknown type.");
         }
         maxIds = maxIds ? maxIds : ids.length;
-        for (let i = 0; i < ids.length || maxIds; i++) {
+        for (let i = 0; i < ids.length && i < maxIds; i++) {
             if (i >= maxIds) {
                 break;
             }
@@ -854,50 +899,6 @@ class Core extends API_1.default {
         }
         if (this.config.debug) {
             console.log(colors.green("Crawling finished."));
-        }
-        return results;
-    }
-    async getRecentEpisodes() {
-        let results = [];
-        const gogo = new GogoAnime_1.default();
-        const anime = await gogo.fetchRecentEpisodes();
-        for (let i = 0; i < anime.length; i++) {
-            const gogoTitle = this.sanitizeTitle(anime[i].title);
-            const possible = await this.aniList.search(gogoTitle, AniList_1.Type.ANIME);
-            if (possible.length > 0) {
-                let best = null;
-                possible.map(async (result) => {
-                    const title = result.title.userPreferred;
-                    const altTitles = Object.values(result.title).concat(result.synonyms);
-                    const aniList = result;
-                    const sim = this.similarity(title, gogoTitle, altTitles);
-                    const tempBest = {
-                        index: i,
-                        similarity: sim,
-                        aniList: aniList,
-                    };
-                    if (!best || sim.value > best.similarity.value) {
-                        best = tempBest;
-                    }
-                });
-                if (best) {
-                    const retEl = anime[best.index];
-                    results.push({
-                        id: retEl.url,
-                        data: best.aniList,
-                        similarity: best.similarity,
-                    });
-                }
-            }
-        }
-        const temp = this.formatSearch(results);
-        results = [];
-        for (let i = 0; i < temp.length; i++) {
-            const id = temp[i].id;
-            const data = await this.get(id);
-            if (data) {
-                results.push(data);
-            }
         }
         return results;
     }

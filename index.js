@@ -1,5 +1,9 @@
 const Anify = require("./built/Anify").default;
+const Animek = require("./built/meta/Animek").default;
 const anify = new Anify({ is_sqlite: true });
+const animek = new Animek();
+
+anify.getSchedule().then(console.log)
 
 /*
 anify.search("In/Spectre season 2", "ANIME").then((data) => {
@@ -10,6 +14,7 @@ anify.search("In/Spectre season 2", "ANIME").then((data) => {
     console.log(data[0].connectors);
 })
 */
+/*
 anify.get("21519").then((data) => {
     console.log(data);
     console.log(data.id)
@@ -18,3 +23,4 @@ anify.get("21519").then((data) => {
     console.log(data.data.description);
     console.log(data.connectors);
 })
+*/

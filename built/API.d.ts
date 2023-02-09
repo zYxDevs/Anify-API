@@ -48,6 +48,8 @@ export default class API {
      * @returns string
      */
     decrypt(url: any): string;
+    solveCaptcha3(key: string, anchorLink: string, url: string): Promise<string>;
+    solveCaptcha3FromHTML(html: string, anchorLink: string, url: string): Promise<string>;
 }
 export declare enum ProviderType {
     ANIME = "ANIME",

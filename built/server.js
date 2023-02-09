@@ -68,10 +68,17 @@ fastify.get("/", async (req, res) => {
     POST /seasonal/:type - Get seasonal anime or manga.\n
     GET /search/:type/:query - Search for anime or manga.\n
     POST /search/:type - Search for anime or manga.\n
+    GET /schedule - Gets the airing schedule for anime.\n
     GET /info/:id - Get anime or manga info.\n
     POST /info - Get anime or manga info.\n
     GET /relations/:id - Get anime or manga relations.\n
     POST /relations - Get anime or manga relations.\n
+    GET /tmdb/:id - Gets TMDB info about a show.\n
+    POST /tmdb - Gets TMDB info about a show.\n
+    GET /themes/:id - Gets anime themes.\n
+    POST /themes - Gets anime themes.\n
+    GET /covers/:id - Gets manga covers.\n
+    POST /covers - Gets manga covers.\n
     GET /episodes/:id - Get anime episodes.\n
     POST /episodes - Get anime episodes.\n
     GET /chapters/:id - Get manga chapters.\n
@@ -378,6 +385,15 @@ fastify.post("/search/:type", async (req, res) => {
         res.type("application/json").code(400);
         return { error: "Unknown type for the given type of " + type + "." };
     }
+});
+fastify.get("/schedule", async (req, res) => {
+    const data = await aniSync.getSchedule();
+    if (!data) {
+        res.type("application/json").code(404);
+        return { error: "Not found" };
+    }
+    res.type("application/json").code(200);
+    return data;
 });
 fastify.get("/info/:id", async (req, res) => {
     const id = req.params["id"];

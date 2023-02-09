@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProviderType = void 0;
 const promise_request_1 = require("./libraries/promise-request");
 const CryptoJS = require("crypto-js");
+const cheerio_1 = require("cheerio");
 class API {
     constructor(type, options) {
         this.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36';
@@ -184,6 +185,43 @@ class API {
         const decrypted = CryptoJS.AES.decrypt(bytes, this.config.encryptionKey);
         const decodedString = Buffer.from(decrypted.toString(CryptoJS.enc.Utf8), "base64");
         return decodedString.toString();
+    }
+    async solveCaptcha3(key, anchorLink, url) {
+        const uri = new URL(url);
+        const domain = uri.protocol + '//' + uri.host;
+        const keyReq = await this.fetch(`https://www.google.com/recaptcha/api.js?render=${key}`, {
+            headers: {
+                Referer: domain,
+            },
+        });
+        const data = keyReq.text();
+        const v = data.substring(data.indexOf('/releases/'), data.lastIndexOf('/recaptcha')).split('/releases/')[1];
+        // ANCHOR IS SPECIFIC TO SITE
+        const curK = anchorLink.split('k=')[1].split('&')[0];
+        const curV = anchorLink.split("v=")[1].split("&")[0];
+        const anchor = anchorLink.replace(curK, key).replace(curV, v);
+        const req = await this.fetch(anchor);
+        const $ = (0, cheerio_1.load)(req.text());
+        const reCaptchaToken = $('input[id="recaptcha-token"]').attr('value');
+        if (!reCaptchaToken)
+            throw new Error('reCaptcha token not found');
+        return reCaptchaToken;
+    }
+    async solveCaptcha3FromHTML(html, anchorLink, url) {
+        const $ = (0, cheerio_1.load)(html);
+        let captcha = null;
+        $("script").map((index, element) => {
+            if ($(element).attr("src") != undefined && $(element).attr("src").includes("/recaptcha/")) {
+                captcha = $(element).attr("src");
+            }
+        });
+        if (!captcha) {
+            throw new Error("Couldn't fetch captcha.");
+        }
+        const captchaURI = new URL(captcha);
+        const captchaId = captchaURI.searchParams.get("render");
+        const captchaKey = await this.solveCaptcha3(captchaId, anchorLink, url);
+        return captchaKey;
     }
 }
 exports.default = API;
