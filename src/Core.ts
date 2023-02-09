@@ -495,7 +495,7 @@ export default class Core extends API {
      * @description Gets the airing schedule and returns cached data.
      * @returns Promise<FormattedResponse[]> - Modified to include the date airing and day airing
      */
-    public async getSchedule(start:number = 0, max:number = 10): Promise<FormattedResponse[]> {
+    public async getSchedule(start:number = 0, max:number = 13): Promise<FormattedResponse[]> {
         const result:FormattedResponse[] = [];
 
         const animek = new Animek();
@@ -503,19 +503,10 @@ export default class Core extends API {
         const stored = await this.getAll(Type.ANIME);
         for (let i = 0; i < animekData.length; i++) {
             const data:any = stored.find((el) => String(el.data.idMal) === String(animekData[i].idMal));
-            /*
-            const data:any = stored.find((el) => {
-                if (String(el.data.idMal) === String(animekData[i].idMal)) {
-                    return el;
-                } else {
-                    return null;
-                }
-            })
-            */
             if (!data) {
                 continue;
             }
-            data.date = animekData[i].datetime;
+            data.date = new Date(animekData[i].datetime).getTime();
             data.day = animekData[i].day;
             result.push(data);
         }

@@ -11,12 +11,12 @@ class API {
             debug: true,
             cache_timeout: 14400000,
             encryptionKey: "myheroacademia",
-            storage: "/Users/eltik/Documents/Anify-API/storage",
+            storage: "/root/Anify-API/storage",
             isMacOS: true,
             poppler_path: "/opt/homebrew/Cellar/poppler/22.12.0/bin",
             web_server: {
-                url: "http://localhost:3060",
-                main_url: "http://localhost:3000",
+                url: "https://api.anify.tv",
+                main_url: "https://anify.tv",
                 cors: ["https://anify.tv", "https://api.anify.tv", "http://localhost:3000", "http://localhost:3060"],
                 port: 3060
             },

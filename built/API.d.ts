@@ -29,7 +29,7 @@ export default class API {
         is_sqlite: boolean;
     };
     constructor(type: ProviderType, options?: any);
-    private loadConfig;
+    loadConfig(options?: any): void;
     fetch(url: string, options?: Options): Promise<Response>;
     stream(url: string, stream: ReadableStream | WritableStream | ReadStream | WriteStream, options?: Options): Promise<unknown>;
     wait(time: number): Promise<unknown>;

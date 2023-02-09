@@ -1,26 +1,4 @@
-const Anify = require("./built/Anify").default;
-const Animek = require("./built/meta/Animek").default;
-const anify = new Anify({ is_sqlite: true });
-const animek = new Animek();
-
-anify.getSchedule().then(console.log)
-
-/*
-anify.search("In/Spectre season 2", "ANIME").then((data) => {
-    console.log(data[0].id)
-    console.log(data[0].data.idMal);
-    console.log(data[0].data.title);
-    console.log(data[0].data.description);
-    console.log(data[0].connectors);
-})
-*/
-/*
-anify.get("21519").then((data) => {
-    console.log(data);
-    console.log(data.id)
-    console.log(data.data.idMal);
-    console.log(data.data.title);
-    console.log(data.data.description);
-    console.log(data.connectors);
-})
-*/
+const Novels = require("./built/novels/Novels").default;
+let novels = new Novels();
+novels.loadConfig();
+novels.insert()

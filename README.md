@@ -36,7 +36,8 @@ DATABASE_URL="postgres://username:password@localhost:5432/anify"
 DATABASE_URL="postgresql://postgres:password@localhost:3306"
 ```
 
-Anify-API requires [PostgreSQL](https://www.postgresql.org/) to run. On MacOS, you can install PostgreSQL via [Homebrew](https://brew.sh/):
+Anify-API requires [PostgreSQL](https://www.postgresql.org/) to run.<br />
+On MacOS, you can install PostgreSQL via [Homebrew](https://brew.sh/):
 ```bash
 # Installation
 brew install postgresql
@@ -47,6 +48,18 @@ brew services start postgresql
 # Stop the server
 brew services stop postgresql
 ```
+On Linux, you can install PostgreSQL via this:
+```bash
+# Installation
+sudo apt-get install postgresql postgresql-contrib
+
+# Start the server
+sudo /etc/init.d/postgresql start
+
+# Stop the server
+sudo /etc/init.d/postgresql stop
+```
+Configuration is located in `/etc/postgresql/12/main/postgresql.conf`.
 
 Then, run the following commands:
 ```bash
