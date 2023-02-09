@@ -59,7 +59,16 @@ sudo /etc/init.d/postgresql start
 # Stop the server
 sudo /etc/init.d/postgresql stop
 ```
-Configuration is located in `/etc/postgresql/12/main/postgresql.conf`.
+On Linux, find `/etc/postgresql/{POSTGRES_VERSION}/main/pg_hba.conf`.
+Update:
+```
+local      all     postgres     peer
+```
+To:
+```
+local      all     postgres     md5
+```
+Restart the database via `sudo /etc/init.d/postgresql restart`.
 
 Then, run the following commands:
 ```bash
