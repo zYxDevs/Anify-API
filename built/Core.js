@@ -28,8 +28,12 @@ class Core extends API_1.default {
         this.aniList = new AniList_1.default();
         this.db = new DB_1.default();
         this.classDictionary = [];
+        this.loadConfig();
         if (options && options.is_sqlite) {
             this.db = new DB_1.default(options.is_sqlite);
+        }
+        if (this.config.is_sqlite) {
+            this.db = new DB_1.default(this.config.is_sqlite);
         }
         dotenv.config();
         // Class dictionary of all providers. Used for looping through and searching.

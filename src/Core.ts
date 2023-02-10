@@ -32,8 +32,12 @@ export default class Core extends API {
 
     constructor(options?:Options) {
         super(ProviderType.NONE, options);
+        this.loadConfig();
         if (options && options.is_sqlite) {
             this.db = new DB(options.is_sqlite);
+        }
+        if (this.config.is_sqlite) {
+            this.db = new DB(this.config.is_sqlite);
         }
 
         dotenv.config();

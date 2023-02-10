@@ -51,24 +51,19 @@ brew services stop postgresql
 On Linux, you can install PostgreSQL via this:
 ```bash
 # Installation
-sudo apt-get install postgresql postgresql-contrib
+sudo apt update
+sudo apt install postgresql postgresql-contrib
 
 # Start the server
-sudo /etc/init.d/postgresql start
+sudo systemctl start postgresql.service
 
 # Stop the server
-sudo /etc/init.d/postgresql stop
+sudo systemctl stop postgresql.service
 ```
-On Linux, find `/etc/postgresql/{POSTGRES_VERSION}/main/pg_hba.conf`.
-Update:
+You can then run `sudo -u postgres psql` and execute commands from there. For example, for creating a new role:
+```bash
+sudo -u postgres psql createuser --interactive
 ```
-local      all     postgres     peer
-```
-To:
-```
-local      all     postgres     md5
-```
-Restart the database via `sudo /etc/init.d/postgresql restart`.
 
 Then, run the following commands:
 ```bash
