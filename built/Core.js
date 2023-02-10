@@ -1066,7 +1066,9 @@ class Core extends API_1.default {
                             const possible = best > -1 ? connectors[best] : connector;
                             let canPush = true;
                             for (let m = 0; m < newConnectors.length; m++) {
-                                if (newConnectors[m].id === possible.id || (0, StringSimilarity_1.compareTwoStrings)(newConnectors[m].id, possible.id) > 0.7) {
+                                const conn = new URL(newConnectors[m].id);
+                                const poss = new URL(possible.id);
+                                if (newConnectors[m].id === possible.id || conn.hostname === poss.hostname) {
                                     canPush = false;
                                 }
                             }
