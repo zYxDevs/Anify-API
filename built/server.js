@@ -69,6 +69,7 @@ fastify.get("/", async (req, res) => {
     GET /search/:type/:query - Search for anime or manga.\n
     POST /search/:type - Search for anime or manga.\n
     GET /schedule - Gets the airing schedule for anime.\n
+    GET /schedule?page={page} - Gets the airing schedule for anime.\n
     GET /info/:id - Get anime or manga info.\n
     POST /info - Get anime or manga info.\n
     GET /relations/:id - Get anime or manga relations.\n
@@ -86,7 +87,9 @@ fastify.get("/", async (req, res) => {
     GET /sources/:id/:provider/:watchId - Get anime sources.\n
     POST /sources - Get anime sources.\n
     GET /pages/:id/:provider/:readId - Get manga pages.\n
-    POST /pages - Get manga pages.\n`;
+    POST /pages - Get manga pages.\n
+    ---------------------\n
+    This documentation is not official and will likely be replaced with https://docs.anify.tv/ in the future.`;
 });
 fastify.get("/all/:type", async (req, res) => {
     const type = req.params["type"];
@@ -387,7 +390,10 @@ fastify.post("/search/:type", async (req, res) => {
     }
 });
 fastify.get("/schedule", async (req, res) => {
-    const data = await aniSync.getSchedule();
+    const page = req.query["page"];
+    const start = page ? page * 13 : 0;
+    const max = page ? (page * 13) + 13 : 13;
+    const data = await aniSync.getSchedule(start, max);
     if (!data) {
         res.type("application/json").code(404);
         return { error: "Not found" };

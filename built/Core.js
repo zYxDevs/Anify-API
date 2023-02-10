@@ -432,21 +432,6 @@ class Core extends API_1.default {
         }
     }
     /**
-     * @description Gets media based on the MAL ID. Only returns CACHED data.
-     * @param id MAL ID of the media to get
-     * @param type Type of media to get
-     * @returns Promise<FormattedResponse>
-     */
-    async getMal(id, type) {
-        const data = await this.getAll(type);
-        for (let i = 0; i < data.length; i++) {
-            const malId = data[i].data.idMal;
-            if (malId && malId === Number(id)) {
-                return data[i];
-            }
-        }
-    }
-    /**
      * @description Gets the airing schedule and returns cached data.
      * @returns Promise<FormattedResponse[]> - Modified to include the date airing and day airing
      */

@@ -29,7 +29,7 @@ export default class Animek extends Provider {
                     idMal: idMal,
                     day: data[i].day,
                     datetime: data[i].datetime
-                });   
+                });
             }
         }
         return result;

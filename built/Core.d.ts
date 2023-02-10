@@ -59,13 +59,6 @@ export default class Core extends API {
      */
     get(id: string): Promise<FormattedResponse>;
     /**
-     * @description Gets media based on the MAL ID. Only returns CACHED data.
-     * @param id MAL ID of the media to get
-     * @param type Type of media to get
-     * @returns Promise<FormattedResponse>
-     */
-    getMal(id: string, type: Type): Promise<FormattedResponse>;
-    /**
      * @description Gets the airing schedule and returns cached data.
      * @returns Promise<FormattedResponse[]> - Modified to include the date airing and day airing
      */
