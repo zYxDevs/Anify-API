@@ -432,6 +432,21 @@ class Core extends API_1.default {
         }
     }
     /**
+     * @description Fetches stored data based on the MyAnimeList ID
+     * @param id MyAnimeList ID of the media to get
+     * @returns Promise<FormattedResponse>
+     */
+    async getMal(id, type) {
+        let res = null;
+        const data = await this.getAll(type);
+        for (let i = 0; i < data.length; i++) {
+            if (String(data[i].id) === String(id)) {
+                res = data[i];
+            }
+        }
+        return res;
+    }
+    /**
      * @description Gets the airing schedule and returns cached data.
      * @returns Promise<FormattedResponse[]> - Modified to include the date airing and day airing
      */
@@ -927,6 +942,9 @@ class Core extends API_1.default {
      * @returns { same: boolean, value: number }
      */
     similarity(externalTitle, title, titleArray = []) {
+        if (!title) {
+            title = "";
+        }
         let simi = (0, StringSimilarity_1.compareTwoStrings)(this.sanitizeTitle(title.toLowerCase()), externalTitle.toLowerCase());
         titleArray.forEach(el => {
             if (el) {

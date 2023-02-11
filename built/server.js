@@ -429,6 +429,36 @@ fastify.post("/info", async (req, res) => {
     res.type("application/json").code(200);
     return data;
 });
+fastify.get("/mal/:type/:id", async (req, res) => {
+    const id = req.params["id"];
+    const type = req.params["type"];
+    if (!id || !type) {
+        res.type("application/json").code(400);
+        return { error: "Invalid request!" };
+    }
+    const data = await aniSync.getMal(id, type);
+    if (!data) {
+        res.type("application/json").code(404);
+        return { error: "Not found" };
+    }
+    res.type("application/json").code(200);
+    return data;
+});
+fastify.post("/mal/:type", async (req, res) => {
+    const id = req.body["id"];
+    const type = req.params["type"];
+    if (!id || !type) {
+        res.type("application/json").code(400);
+        return { error: "Invalid request!" };
+    }
+    const data = await aniSync.getMal(id, type);
+    if (!data) {
+        res.type("application/json").code(404);
+        return { error: "Not found" };
+    }
+    res.type("application/json").code(200);
+    return data;
+});
 fastify.get("/relations/:id", async (req, res) => {
     const id = req.params["id"];
     if (!id) {
